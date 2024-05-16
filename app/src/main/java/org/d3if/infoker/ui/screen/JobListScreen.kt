@@ -1,8 +1,5 @@
-package org.d3if.infoker
+package org.d3if.infoker.ui.screen
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,7 +24,6 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,18 +37,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.d3if.infoker.ui.theme.InfokerTheme
+import org.d3if.infoker.R
 
-data class Job(val title: String, val description: String, val location: String)
+data class JobBezoz(val title: String, val description: String, val location: String)
 
 val dummyJobs = listOf(
-    Job("Android Developer", "Develop Android applications", "New York"),
-    Job("Web Developer", "Develop web applications", "San Francisco"),
-    Job("Data Scientist", "Analyze big data", "Chicago"),
-    Job("Data Scientist", "Analyze big data", "Chicago"),
-    Job("Data Scientist", "Analyze big data", "Chicago"),
-    Job("Data Scientist", "Analyze big data", "Chicago"),
-    Job("Data Scientist", "Analyze big data", "Chicago")
+    JobBezoz("Android Developer", "Develop Android applications", "New York"),
+    JobBezoz("Web Developer", "Develop web applications", "San Francisco"),
+    JobBezoz("Data Scientist", "Analyze big data", "Chicago"),
+    JobBezoz("Data Scientist", "Analyze big data", "Chicago"),
+    JobBezoz("Data Scientist", "Analyze big data", "Chicago"),
+    JobBezoz("Data Scientist", "Analyze big data", "Chicago"),
+    JobBezoz("Data Scientist", "Analyze big data", "Chicago")
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -174,7 +170,7 @@ fun TopAppBars() {
 }
 
 @Composable
-fun JobList(jobs: List<Job>, modifier: Modifier) {
+fun JobList(jobs: List<JobBezoz>, modifier: Modifier) {
     LazyColumn(
         modifier = modifier.fillMaxSize()
     ) {
@@ -185,7 +181,7 @@ fun JobList(jobs: List<Job>, modifier: Modifier) {
 }
 
 @Composable
-fun JobListItem(job: Job) {
+fun JobListItem(job: JobBezoz) {
     Box (
         modifier = Modifier
             .fillMaxWidth()
