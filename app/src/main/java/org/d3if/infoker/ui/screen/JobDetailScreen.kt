@@ -32,7 +32,7 @@ import org.d3if.infoker.util.ViewModelFactory
 
 @Composable
 fun JobDetailScreen(
-    jobViewModel: JobDetailViewModel = viewModel(
+    jobDetailViewModel: JobDetailViewModel = viewModel(
         factory = ViewModelFactory(
             FirestoreRepository(FirebaseFirestore.getInstance())
         )
@@ -42,7 +42,9 @@ fun JobDetailScreen(
         mutableStateOf("")
     }
 
-    var description by remember {
+    val company = "Afta Tunas Jaya Abadi Tbk."
+
+    var location by remember {
         mutableStateOf("")
     }
 
@@ -50,16 +52,22 @@ fun JobDetailScreen(
         mutableStateOf("")
     }
 
+    var description by remember {
+        mutableStateOf("")
+    }
+
     Scaffold { padding ->
         ScreenContent(
             title = title,
             onTitleChange = { title = it },
-            description = description,
-            onDescriptionChange = { description = it },
+            location = location,
+            onLocationChange = { location = it },
             salary = salary,
             onSalaryChange = { salary = it },
+            description = description,
+            onDescriptionChange = { description = it },
             onAddJobClick = {
-                jobViewModel.addJob(title, description, salary.toFloat())
+                jobDetailViewModel.addJob(title, company, location, salary.toFloat(), description)
             },
             modifier = Modifier.padding(padding)
         )
@@ -72,10 +80,12 @@ fun JobDetailScreen(
 fun ScreenContent(
     title: String,
     onTitleChange: (String) -> Unit,
-    description: String,
-    onDescriptionChange: (String) -> Unit,
+    location: String,
+    onLocationChange: (String) -> Unit,
     salary: String,
     onSalaryChange: (String) -> Unit,
+    description: String,
+    onDescriptionChange: (String) -> Unit,
     onAddJobClick: () -> Unit,
     modifier: Modifier
 ) {
@@ -89,6 +99,17 @@ fun ScreenContent(
             value = title,
             onValueChange = { onTitleChange(it) },
             label = { Text(text = stringResource(id = R.string.title)) },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Words,
+                imeAction = ImeAction.Next
+            ),
+            modifier = modifier.fillMaxWidth()
+        )
+        OutlinedTextField(
+            value = location,
+            onValueChange = { onLocationChange(it) },
+            label = { Text(text = stringResource(id = R.string.location)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Words,

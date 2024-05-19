@@ -1,7 +1,10 @@
 package org.d3if.infoker.model
 
 data class Job(
-    val title: String,
-    val salary: Float,
-    val description: String
+    val id: String = "",
+    val title: String = "",
+    val company: String = "",
+    val location: String = "",
+    val salary: Float = 0.0f,
+    val description: String = ""
 )

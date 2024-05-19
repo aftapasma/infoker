@@ -1,11 +1,18 @@
 package org.d3if.infoker.ui.screen
-
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -27,6 +34,7 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -34,35 +42,38 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.firebase.firestore.FirebaseFirestore
+import org.d3if.infoker.FirestoreRepository
 import org.d3if.infoker.R
-
-data class JobBezoz(val title: String, val description: String, val location: String)
-
-val dummyJobs = listOf(
-    JobBezoz("Android Developer", "Develop Android applications", "New York"),
-    JobBezoz("Web Developer", "Develop web applications", "San Francisco"),
-    JobBezoz("Data Scientist", "Analyze big data", "Chicago"),
-    JobBezoz("Data Scientist", "Analyze big data", "Chicago"),
-    JobBezoz("Data Scientist", "Analyze big data", "Chicago"),
-    JobBezoz("Data Scientist", "Analyze big data", "Chicago"),
-    JobBezoz("Data Scientist", "Analyze big data", "Chicago")
-)
+import org.d3if.infoker.model.Job
+import org.d3if.infoker.ui.theme.InfokerTheme
+import org.d3if.infoker.util.ViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBars() {
+fun JobListScreen(
+    jobListViewModel: JobListViewModel = viewModel(
+        factory = ViewModelFactory(
+            FirestoreRepository(FirebaseFirestore.getInstance())
+        )
+    )
+) {
     var text by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
+
+    val jobs by jobListViewModel.jobs.observeAsState(initial = emptyList())
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        "Infoker",
+                        stringResource(R.string.app_name),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -71,7 +82,7 @@ fun TopAppBars() {
                     IconButton(onClick = { /* doSomething() */ }) {
                         Icon(
                             imageVector = Icons.Filled.Settings,
-                            contentDescription = "Localized description"
+                            contentDescription = "Settings"
                         )
                     }
                 },
@@ -79,7 +90,7 @@ fun TopAppBars() {
                     IconButton(onClick = { /* doSomething() */ }) {
                         Icon(
                             imageVector = Icons.Filled.Info,
-                            contentDescription = "Localized description"
+                            contentDescription = "Info"
                         )
                     }
                 }
@@ -93,18 +104,18 @@ fun TopAppBars() {
                         horizontalArrangement = Arrangement.Center
                     ) {
                         IconButton(
-                            onClick = {  },
+                            onClick = { },
                             modifier = Modifier
                                 .size(48.dp)
                                 .weight(1f)
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.baseline_bookmark_border_24),
-                                contentDescription = "Localized description",
+                                contentDescription = "Bookmark"
                             )
                         }
                         IconButton(
-                            onClick = {  },
+                            onClick = { },
                             modifier = Modifier
                                 .size(48.dp)
                                 .weight(1f)
@@ -115,7 +126,7 @@ fun TopAppBars() {
                             )
                         }
                         IconButton(
-                            onClick = {  },
+                            onClick = { },
                             modifier = Modifier
                                 .size(48.dp)
                                 .weight(1f)
@@ -135,24 +146,22 @@ fun TopAppBars() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 SearchBar(
-                    modifier = Modifier.padding(top = 8.dp), // Adjust top padding here
+                    modifier = Modifier.padding(top = 8.dp),
                     query = text,
                     onQueryChange = { text = it },
                     onSearch = { active = false },
                     active = active,
-                    onActiveChange = {
-                        active = it
-                    },
-                    placeholder = { Text("Hinted search text") },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                    trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = null) },
+                    onActiveChange = { active = it },
+                    placeholder = { Text("Search jobs") },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                    trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = "More") },
                 ) {
                     repeat(4) { idx ->
                         val resultText = "Suggestion $idx"
                         ListItem(
                             headlineContent = { Text(resultText) },
                             supportingContent = { Text("Additional info") },
-                            leadingContent = { Icon(Icons.Filled.Star, contentDescription = null) },
+                            leadingContent = { Icon(Icons.Filled.Star, contentDescription = "Star") },
                             modifier = Modifier
                                 .clickable {
                                     text = resultText
@@ -163,32 +172,32 @@ fun TopAppBars() {
                         )
                     }
                 }
-                JobList(jobs = dummyJobs, modifier = Modifier.weight(1f))
+                JobList(jobs = jobs, modifier = Modifier.weight(1f))
             }
         }
     )
 }
 
 @Composable
-fun JobList(jobs: List<JobBezoz>, modifier: Modifier) {
+fun JobList(jobs: List<Job>, modifier: Modifier) {
     LazyColumn(
         modifier = modifier.fillMaxSize()
     ) {
         items(jobs) { job ->
-            JobListItem(job = job)
+            JobListItem(job)
         }
     }
 }
 
 @Composable
-fun JobListItem(job: JobBezoz) {
-    Box (
+fun JobListItem(job: Job) {
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .border(1.dp, Color.Black, RoundedCornerShape(16.dp))
     ) {
-        Row (
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
@@ -197,19 +206,21 @@ fun JobListItem(job: JobBezoz) {
         ) {
             Image(
                 painter = painterResource(id = R.drawable.baseline_android_24),
-                contentDescription = "Logo Perusahaan",
+                contentDescription = "Company Logo",
                 modifier = Modifier
                     .size(48.dp)
                     .padding(8.dp)
             )
-            Column(modifier = Modifier
-                .weight(1f)
-                .padding(8.dp),
-                verticalArrangement = Arrangement.Center // Align text content vertically to the start
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(8.dp),
+                verticalArrangement = Arrangement.Center
             ) {
                 Text(text = job.title, style = MaterialTheme.typography.titleLarge)
-                Text(text = job.description, style = MaterialTheme.typography.titleMedium)
+                Text(text = job.company, style = MaterialTheme.typography.titleMedium)
                 Text(text = job.location, style = MaterialTheme.typography.titleSmall)
+                Text(text = stringResource(id = R.string.salary_format, job.salary), style = MaterialTheme.typography.titleSmall)
             }
             Image(
                 painter = painterResource(id = R.drawable.baseline_bookmark_border_24),
@@ -222,9 +233,11 @@ fun JobListItem(job: JobBezoz) {
     }
 }
 
-
 @Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewJobList() {
-    TopAppBars()
+    InfokerTheme {
+        JobListScreen()
+    }
 }
