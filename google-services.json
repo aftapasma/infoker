@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "36864228552",
+    "project_id": "infoker-45e61",
+    "storage_bucket": "infoker-45e61.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:36864228552:android:7ded744cff57aff273f9fd",
+        "android_client_info": {
+          "package_name": "com.afta_tbk.infoker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9aLTK_Q1TairwnmAlyKPoQOIT2UGTAKs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
