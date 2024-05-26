@@ -10,9 +10,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -47,25 +47,31 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import org.d3if.infoker.FirestoreRepository
 import org.d3if.infoker.R
-import org.d3if.infoker.model.Job
+import org.d3if.infoker.navigation.Screen
+import org.d3if.infoker.repository.AuthRepository
+import org.d3if.infoker.repository.FirestoreRepository
 import org.d3if.infoker.ui.theme.InfokerTheme
-import org.d3if.infoker.util.ViewModelFactory
+import org.d3if.infoker.util.AuthViewModelFactory
+import org.d3if.infoker.util.JobViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun JobListScreen(
-    jobListViewModel: JobListViewModel = viewModel(
-        factory = ViewModelFactory(
-            FirestoreRepository(FirebaseFirestore.getInstance())
-        )
-    )
+    navController: NavHostController
 ) {
     var text by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
 
+    val authRepository = AuthRepository()
+    val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
+    val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(authRepository, firestoreRepository))
+
+    val jobListViewModel: JobListViewModel = viewModel(factory = JobViewModelFactory(firestoreRepository))
     val jobs by jobListViewModel.jobs.observeAsState(initial = emptyList())
 
     Scaffold(
@@ -79,7 +85,7 @@ fun JobListScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /* doSomething() */ }) {
+                    IconButton(onClick = { authViewModel.logout(navController) }) {
                         Icon(
                             imageVector = Icons.Filled.Settings,
                             contentDescription = "Settings"
@@ -87,7 +93,7 @@ fun JobListScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* doSomething() */ }) {
+                    IconButton(onClick = { navController.navigate(Screen.AddJob.route) }) {
                         Icon(
                             imageVector = Icons.Filled.Info,
                             contentDescription = "Info"
@@ -172,30 +178,43 @@ fun JobListScreen(
                         )
                     }
                 }
-                JobList(jobs = jobs, modifier = Modifier.weight(1f))
+                JobList(jobs = jobs, modifier = Modifier.weight(1f)) {navController.navigate(Screen.JobDetail.withId(it.id))}
             }
         }
     )
 }
 
 @Composable
-fun JobList(jobs: List<Job>, modifier: Modifier) {
+fun JobList(
+    jobs: List<DocumentSnapshot>,
+    modifier: Modifier = Modifier,
+    onClick: (DocumentSnapshot) -> Unit
+) {
     LazyColumn(
         modifier = modifier.fillMaxSize()
     ) {
         items(jobs) { job ->
-            JobListItem(job)
+            JobListItem(job = job, onClick = {onClick(job)})
+//                Log.d("JobList", "Job ID clicked: $job.id")
         }
     }
 }
 
 @Composable
-fun JobListItem(job: Job) {
+fun JobListItem(job: DocumentSnapshot, onClick: () -> Unit) {
+    val company = "Afta Tunas Jaya Abadi Barokah Tbk."
+
+    // Extracting job details from DocumentSnapshot
+    val title = job.getString("title") ?: ""
+    val location = job.getString("location") ?: ""
+    val salary = job.getDouble("salary") ?: 0.0
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .border(1.dp, Color.Black, RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick)
     ) {
         Row(
             modifier = Modifier
@@ -217,10 +236,10 @@ fun JobListItem(job: Job) {
                     .padding(8.dp),
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(text = job.title, style = MaterialTheme.typography.titleLarge)
-                Text(text = job.company, style = MaterialTheme.typography.titleMedium)
-                Text(text = job.location, style = MaterialTheme.typography.titleSmall)
-                Text(text = stringResource(id = R.string.salary_format, job.salary), style = MaterialTheme.typography.titleSmall)
+                Text(text = title, style = MaterialTheme.typography.titleLarge)
+                Text(text = company, style = MaterialTheme.typography.titleMedium)
+                Text(text = location, style = MaterialTheme.typography.titleSmall)
+                Text(text = stringResource(id = R.string.salary_format, salary), style = MaterialTheme.typography.titleSmall)
             }
             Image(
                 painter = painterResource(id = R.drawable.baseline_bookmark_border_24),
@@ -238,6 +257,6 @@ fun JobListItem(job: Job) {
 @Composable
 fun PreviewJobList() {
     InfokerTheme {
-        JobListScreen()
+        JobListScreen(rememberNavController())
     }
 }

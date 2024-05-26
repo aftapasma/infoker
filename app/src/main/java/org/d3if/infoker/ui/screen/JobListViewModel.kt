@@ -5,13 +5,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.launch
-import org.d3if.infoker.FirestoreRepository
-import org.d3if.infoker.model.Job
+import org.d3if.infoker.repository.FirestoreRepository
 
 class JobListViewModel(private val repository: FirestoreRepository) : ViewModel() {
-    private val _jobs = MutableLiveData<List<Job>>()
-    val jobs: LiveData<List<Job>> get() = _jobs
+    private val _jobs = MutableLiveData<List<DocumentSnapshot>>()
+    val jobs: LiveData<List<DocumentSnapshot>> get() = _jobs
 
     init {
         getJobs()

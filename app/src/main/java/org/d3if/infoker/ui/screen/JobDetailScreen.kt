@@ -1,157 +1,217 @@
 package org.d3if.infoker.ui.screen
 
-import android.content.res.Configuration
+import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.google.firebase.firestore.FirebaseFirestore
-import org.d3if.infoker.FirestoreRepository
 import org.d3if.infoker.R
-import org.d3if.infoker.ui.theme.InfokerTheme
-import org.d3if.infoker.util.ViewModelFactory
+import org.d3if.infoker.repository.FirestoreRepository
+import org.d3if.infoker.util.JobViewModelFactory
 
+const val KEY_JOB_ID = "jobId"
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun JobDetailScreen(
-    jobDetailViewModel: JobDetailViewModel = viewModel(
-        factory = ViewModelFactory(
-            FirestoreRepository(FirebaseFirestore.getInstance())
-        )
+fun JobDetailScreen(navController: NavHostController, id: String?) {
+    val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
+    val jobDetailViewModel: JobDetailViewModel = viewModel(factory = JobViewModelFactory(firestoreRepository))
+
+    LaunchedEffect(id) {
+        id?.let { jobDetailViewModel.getJobById(it) }
+    }
+
+    val jobDetail by jobDetailViewModel.jobDetail.observeAsState(initial = null)
+
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        "Infoker",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Localized description"
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(
+                            imageVector = Icons.Filled.Favorite,
+                            contentDescription = "Localized description"
+                        )
+                    }
+                }
+            )
+        },
+        bottomBar = {
+            BottomAppBar(
+                content = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        IconButton(
+                            onClick = {  },
+                            modifier = Modifier
+                                .size(48.dp)
+                                .weight(1f)
+                        ) {
+                            Button(
+                                onClick = {  }
+                            ) {
+                                Text(text = "Lamar")
+                            }
+                        }
+                    }
+                }
+            )
+        },
+        content = {
+            jobDetail?.let { job ->
+                JobDetail(
+                    title = job.getString("title") ?: "",
+                    company = "Afta Tunas Jaya Abadi Barokah Tbk.",
+                    location = job.getString("location") ?: "",
+                    salary = job.getDouble("salary")?.toFloat() ?: 0.0f,
+                    description = job.getString("description") ?: "",
+                    modifier = Modifier.padding(top = 70.dp)
+                )
+            } ?: run {
+                // Handle case where job is null (e.g., show a loading indicator or an error message)
+                Text(
+                    text = "Job Not Found",
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        }
     )
-) {
-    var title by remember {
-        mutableStateOf("")
-    }
-
-    val company = "Afta Tunas Jaya Abadi Tbk."
-
-    var location by remember {
-        mutableStateOf("")
-    }
-
-    var salary by remember {
-        mutableStateOf("")
-    }
-
-    var description by remember {
-        mutableStateOf("")
-    }
-
-    Scaffold { padding ->
-        ScreenContent(
-            title = title,
-            onTitleChange = { title = it },
-            location = location,
-            onLocationChange = { location = it },
-            salary = salary,
-            onSalaryChange = { salary = it },
-            description = description,
-            onDescriptionChange = { description = it },
-            onAddJobClick = {
-                jobDetailViewModel.addJob(title, company, location, salary.toFloat(), description)
-            },
-            modifier = Modifier.padding(padding)
-        )
-    }
-
-
 }
 
 @Composable
-fun ScreenContent(
+fun JobDetail(
     title: String,
-    onTitleChange: (String) -> Unit,
+    company: String,
     location: String,
-    onLocationChange: (String) -> Unit,
-    salary: String,
-    onSalaryChange: (String) -> Unit,
+    salary: Float,
     description: String,
-    onDescriptionChange: (String) -> Unit,
-    onAddJobClick: () -> Unit,
     modifier: Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+    Surface(
+        color = MaterialTheme.colorScheme.background,
+        modifier = modifier.fillMaxSize()
     ) {
-        OutlinedTextField(
-            value = title,
-            onValueChange = { onTitleChange(it) },
-            label = { Text(text = stringResource(id = R.string.title)) },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.Words,
-                imeAction = ImeAction.Next
-            ),
-            modifier = modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
-            value = location,
-            onValueChange = { onLocationChange(it) },
-            label = { Text(text = stringResource(id = R.string.location)) },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.Words,
-                imeAction = ImeAction.Next
-            ),
-            modifier = modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
-            value = salary,
-            onValueChange = { onSalaryChange(it) },
-            label = { Text(text = stringResource(id = R.string.salary)) },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Next
-            ),
-            modifier = modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
-            value = description,
-            onValueChange = { onDescriptionChange(it) },
-            label = { Text(text = stringResource(id = R.string.description)) },
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.Sentences,
-                imeAction = ImeAction.Next
-            ),
-            modifier = modifier.fillMaxWidth()
-        )
-        Button(
-            onClick = { onAddJobClick() },
-            modifier = modifier.fillMaxWidth()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = stringResource(id = R.string.add))
+            Image(
+                painter = painterResource(id = R.drawable.baseline_android_24),
+                contentDescription = "Logo Perusahaan",
+                modifier = Modifier.size(100.dp)
+            )
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Text(
+                text = "Company: $company",
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Text(
+                text = "Location: $location",
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            Text(
+                text = "Salary: $salary",
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            Text(
+                text = "Description:",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+//            Text(
+//                text = "Requirements:",
+//                style = MaterialTheme.typography.titleMedium,
+//                fontWeight = FontWeight.Bold,
+//                modifier = Modifier.padding(bottom = 8.dp)
+//            )
+//            LazyColumn {
+//                items(jobDetail.requirements) { requirement ->
+//                    Text(
+//                        text = "• $requirement",
+//                        style = MaterialTheme.typography.titleLarge,
+//                        fontSize = 16.sp,
+//                        modifier = Modifier.padding(bottom = 8.dp)
+//                    )
+//                }
+//            }
         }
     }
 }
 
 @Preview(showBackground = true)
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun JobDetailScreenPreview() {
-    InfokerTheme {
-        JobDetailScreen()
-    }
+fun PreviewJobDetailScreen() {
+    JobDetail(
+        title = "Budak Hitam",
+        company = "Afta Tunas Jaya Abadi Tbk.",
+        location = "Merangin, Jambi",
+        salary = 0f,
+        description = "Dicari orang-orang hitam.",
+        modifier = Modifier
+    )
 }
