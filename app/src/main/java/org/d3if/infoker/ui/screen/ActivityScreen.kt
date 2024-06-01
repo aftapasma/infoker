@@ -3,6 +3,7 @@ package org.d3if.infoker.ui.screen
 import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -135,14 +136,14 @@ fun ActivityScreen(navController: NavHostController) {
             )
         },
         content = { paddingValues ->
-            MyApplication(modifier = Modifier.padding(paddingValues))
+            MyApplication(navController = navController, modifier = Modifier.padding(paddingValues))
         }
     )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MyApplication(modifier: Modifier = Modifier) {
+fun MyApplication(navController: NavHostController, modifier: Modifier = Modifier) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf("Disimpan", "Dilamar")
     val pagerState = rememberPagerState {
@@ -189,15 +190,15 @@ fun MyApplication(modifier: Modifier = Modifier) {
                 .weight(1f)
         ) {
             when (selectedTabIndex) {
-                0 -> SavedApplicationsList()
-                1 -> AppliedApplicationsList(viewModel = activityViewModel)
+                0 -> SavedApplicationsList(navController)
+                1 -> AppliedApplicationsList(navController)
             }
         }
     }
 }
 
 @Composable
-fun SavedApplicationsList(viewModel: ActivityViewModel = viewModel()) {
+fun SavedApplicationsList(navController: NavHostController, viewModel: ActivityViewModel = viewModel()) {
     val bookmarks by viewModel.getBookmarksForCurrentUser().collectAsState(initial = emptyList())
 
     LazyColumn {
@@ -208,16 +209,18 @@ fun SavedApplicationsList(viewModel: ActivityViewModel = viewModel()) {
         } else {
             items(bookmarks) { document ->
                 val jobData = document.get("job") as? Map<*, *>
+                val jobId = jobData?.get("id") as? String ?: "N/A"
                 val title = jobData?.get("title") as? String ?: "N/A"
                 val company = jobData?.get("company") as? String ?: "Afta Tunas Jaya Abadi Tbk."
-                val date = document.getString("date") ?: "N/A"
+                val date = jobData?.get("createdAt").toString()
                 val location = jobData?.get("location") as? String ?: "N/A"
 
                 JobApplicationItem(
                     title = title,
                     company = company,
                     date = date,
-                    location = location
+                    location = location,
+                    onClick = { navController.navigate(Screen.JobDetail.withId(jobId)) }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -226,7 +229,7 @@ fun SavedApplicationsList(viewModel: ActivityViewModel = viewModel()) {
 }
 
 @Composable
-fun AppliedApplicationsList(viewModel: ActivityViewModel = viewModel()) {
+fun AppliedApplicationsList(navController: NavHostController, viewModel: ActivityViewModel = viewModel()) {
     val applications by viewModel.getApplicationsForCurrentUser().collectAsState(initial = emptyList())
 
     LazyColumn {
@@ -237,9 +240,10 @@ fun AppliedApplicationsList(viewModel: ActivityViewModel = viewModel()) {
         } else {
             items(applications) { document ->
                 val jobData = document.get("job") as? Map<*, *>
+                val jobId = jobData?.get("id") as? String ?: "N/A"
                 val title = jobData?.get("title") as? String ?: "N/A"
                 val company = jobData?.get("company") as? String ?: "Afta Tunas Jaya Abadi Tbk."
-                val date = document.getString("date") ?: "N/A"
+                val date = jobData?.get("createdAt").toString()
                 val location = jobData?.get("location") as? String ?: "N/A"
                 val status = "Dilamar di situs perusahaan"
                 val statusDate = "10 Jan 2023"
@@ -250,7 +254,8 @@ fun AppliedApplicationsList(viewModel: ActivityViewModel = viewModel()) {
                     date = date,
                     location = location,
                     status = status,
-                    statusDate = statusDate
+                    statusDate = statusDate,
+                    onClick = { navController.navigate(Screen.JobDetail.withId(jobId)) }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -266,12 +271,14 @@ fun JobApplicationItem(
     date: String,
     location: String,
     status: String? = null,
-    statusDate: String? = null
+    statusDate: String? = null,
+    onClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = 4.dp)
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(8.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
