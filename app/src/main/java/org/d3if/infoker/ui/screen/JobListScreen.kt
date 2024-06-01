@@ -33,6 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -73,6 +74,10 @@ fun JobListScreen(
 
     val jobListViewModel: JobListViewModel = viewModel(factory = JobViewModelFactory(authRepository, firestoreRepository))
     val jobs by jobListViewModel.jobs.observeAsState(initial = emptyList())
+
+    LaunchedEffect(text) {
+        jobListViewModel.searchJobs(text)
+    }
 
     Scaffold(
         topBar = {
@@ -154,7 +159,10 @@ fun JobListScreen(
                 SearchBar(
                     modifier = Modifier.padding(top = 8.dp),
                     query = text,
-                    onQueryChange = { text = it },
+                    onQueryChange = { newText ->
+                        text = newText
+                        jobListViewModel.searchJobs(newText)
+                    },
                     onSearch = { active = false },
                     active = active,
                     onActiveChange = { active = it },
@@ -162,21 +170,7 @@ fun JobListScreen(
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                     trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = "More") },
                 ) {
-                    repeat(4) { idx ->
-                        val resultText = "Suggestion $idx"
-                        ListItem(
-                            headlineContent = { Text(resultText) },
-                            supportingContent = { Text("Additional info") },
-                            leadingContent = { Icon(Icons.Filled.Star, contentDescription = "Star") },
-                            modifier = Modifier
-                                .clickable {
-                                    text = resultText
-                                    active = false
-                                }
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 4.dp)
-                        )
-                    }
+
                 }
                 JobList(jobs = jobs, modifier = Modifier.weight(1f)) {navController.navigate(Screen.JobDetail.withId(it.id))}
             }

@@ -24,4 +24,15 @@ class JobListViewModel(private val firestoreRepository: FirestoreRepository) : V
             _jobs.value = fetchedJobs
         }
     }
+    fun searchJobs(query: String) {
+        val filteredJobs = if (query.isNotBlank()) {
+            jobs.value?.filter { job ->
+                val title = job.getString("title") ?: ""
+                title.contains(query, ignoreCase = true)
+            } ?: emptyList()
+        } else {
+            jobs.value ?: emptyList()
+        }
+        _jobs.value = filteredJobs
+    }
 }
