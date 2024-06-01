@@ -1,6 +1,7 @@
 package org.d3if.infoker.ui.screen
 
 import android.content.res.Configuration
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -28,6 +33,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -134,10 +140,20 @@ fun ActivityScreen(navController: NavHostController) {
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MyApplication(modifier: Modifier = Modifier) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf("Disimpan", "Dilamar")
+    val pagerState = rememberPagerState {
+        tabs.size
+    }
+    LaunchedEffect(selectedTabIndex) {
+        pagerState.animateScrollToPage(selectedTabIndex)
+    }
+    LaunchedEffect(pagerState.currentPage) {
+        selectedTabIndex = pagerState.currentPage
+    }
 
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
     val authRepository = AuthRepository()
@@ -157,7 +173,7 @@ fun MyApplication(modifier: Modifier = Modifier) {
         ) {
             tabs.forEachIndexed { index, title ->
                 Tab(
-                    selected = selectedTabIndex == index,
+                    selected = index == selectedTabIndex,
                     onClick = { selectedTabIndex = index },
                     modifier = Modifier.padding(10.dp)
                 ) {
@@ -165,10 +181,17 @@ fun MyApplication(modifier: Modifier = Modifier) {
                 }
             }
         }
-        Spacer(modifier = Modifier.height(8.dp))
-        when (selectedTabIndex) {
-            0 -> SavedApplicationsList()
-            1 -> AppliedApplicationsList(viewModel = activityViewModel)
+        Spacer(modifier = Modifier.height(16.dp))
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f)
+        ) {
+            when (selectedTabIndex) {
+                0 -> SavedApplicationsList()
+                1 -> AppliedApplicationsList(viewModel = activityViewModel)
+            }
         }
     }
 }
@@ -177,11 +200,13 @@ fun MyApplication(modifier: Modifier = Modifier) {
 fun SavedApplicationsList(viewModel: ActivityViewModel = viewModel()) {
     val bookmarks by viewModel.getBookmarksForCurrentUser().collectAsState(initial = emptyList())
 
-    Column {
+    LazyColumn {
         if (bookmarks.isEmpty()) {
-            Text("No bookmarks found.")
+            item {
+                Text("No bookmarks found.")
+            }
         } else {
-            bookmarks.forEach { document ->
+            items(bookmarks) { document ->
                 val jobData = document.get("job") as? Map<*, *>
                 val title = jobData?.get("title") as? String ?: "N/A"
                 val company = jobData?.get("company") as? String ?: "Afta Tunas Jaya Abadi Tbk."
@@ -204,11 +229,13 @@ fun SavedApplicationsList(viewModel: ActivityViewModel = viewModel()) {
 fun AppliedApplicationsList(viewModel: ActivityViewModel = viewModel()) {
     val applications by viewModel.getApplicationsForCurrentUser().collectAsState(initial = emptyList())
 
-    Column {
+    LazyColumn {
         if (applications.isEmpty()) {
-            Text("No applications found.")
+            item {
+                Text("No applications found.")
+            }
         } else {
-            applications.forEach { document ->
+            items(applications) { document ->
                 val jobData = document.get("job") as? Map<*, *>
                 val title = jobData?.get("title") as? String ?: "N/A"
                 val company = jobData?.get("company") as? String ?: "Afta Tunas Jaya Abadi Tbk."
@@ -230,6 +257,7 @@ fun AppliedApplicationsList(viewModel: ActivityViewModel = viewModel()) {
         }
     }
 }
+
 
 @Composable
 fun JobApplicationItem(

@@ -207,6 +207,7 @@ fun JobListItem(job: DocumentSnapshot, onClick: () -> Unit) {
     val title = job.getString("title") ?: ""
     val location = job.getString("location") ?: ""
     val salary = job.getDouble("salary") ?: 0.0
+    val date = job.getDate("createdAt") ?: ""
 
     Box(
         modifier = Modifier
@@ -239,6 +240,7 @@ fun JobListItem(job: DocumentSnapshot, onClick: () -> Unit) {
                 Text(text = company, style = MaterialTheme.typography.titleMedium)
                 Text(text = location, style = MaterialTheme.typography.titleSmall)
                 Text(text = stringResource(id = R.string.salary_format, salary), style = MaterialTheme.typography.titleSmall)
+                Text(text = date.toString(), style = MaterialTheme.typography.titleSmall)
             }
 //            Image(
 //                painter = painterResource(id = R.drawable.baseline_bookmark_border_24),
