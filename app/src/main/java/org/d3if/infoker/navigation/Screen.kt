@@ -10,4 +10,5 @@ sealed class Screen(val route: String) {
         fun withId(id: String) = "jobDetailScreen/$id"
     }
     data object AddJob: Screen("AddJobScreen")
+    data object Activity: Screen("ActivityScreen")
 }

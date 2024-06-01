@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -37,6 +36,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.google.firebase.firestore.FirebaseFirestore
 import org.d3if.infoker.R
+import org.d3if.infoker.navigation.Screen
+import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
 import org.d3if.infoker.util.JobViewModelFactory
 
@@ -47,13 +48,17 @@ const val KEY_JOB_ID = "jobId"
 @Composable
 fun JobDetailScreen(navController: NavHostController, id: String?) {
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
-    val jobDetailViewModel: JobDetailViewModel = viewModel(factory = JobViewModelFactory(firestoreRepository))
+    val authRepository = AuthRepository()
 
+    val jobDetailViewModel: JobDetailViewModel = viewModel(factory = JobViewModelFactory(authRepository, firestoreRepository))
     LaunchedEffect(id) {
         id?.let { jobDetailViewModel.getJobById(it) }
     }
 
-    val jobDetail by jobDetailViewModel.jobDetail.observeAsState(initial = null)
+    val jobDetail by jobDetailViewModel.jobDetail.observeAsState()
+    val isApplied by jobDetailViewModel.isApplied.observeAsState(false)
+    val isBookmarked by jobDetailViewModel.isBookmarked.observeAsState(false)
+    val currentUser = authRepository.getCurrentUser()
 
     Scaffold(
         topBar = {
@@ -74,10 +79,18 @@ fun JobDetailScreen(navController: NavHostController, id: String?) {
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* doSomething() */ }) {
+                    IconButton(onClick = {
+                        if (currentUser == null) {
+                            navController.navigate(Screen.Login.route)
+                        } else {
+                            jobDetail?.let { job ->
+                                jobDetailViewModel.toggleBookmark(job)
+                            }
+                        }
+                    }) {
                         Icon(
-                            imageVector = Icons.Filled.Favorite,
-                            contentDescription = "Localized description"
+                            painter = painterResource(id = if (!isBookmarked) R.drawable.baseline_bookmark_border_24 else R.drawable.baseline_bookmark_24),
+                            contentDescription = "Bookmark"
                         )
                     }
                 }
@@ -97,9 +110,17 @@ fun JobDetailScreen(navController: NavHostController, id: String?) {
                                 .weight(1f)
                         ) {
                             Button(
-                                onClick = {  }
+                                onClick = {
+                                    if (currentUser == null) {
+                                        navController.navigate(Screen.Login.route)
+                                    } else {
+                                        jobDetail?.let { job ->
+                                            jobDetailViewModel.toggleApplication(job)
+                                        }
+                                    }
+                                }
                             ) {
-                                Text(text = "Lamar")
+                                Text(text = if (!isApplied) "Apply" else "Cancel")
                             }
                         }
                     }

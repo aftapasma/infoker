@@ -9,7 +9,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.launch
 import org.d3if.infoker.repository.FirestoreRepository
 
-class JobListViewModel(private val repository: FirestoreRepository) : ViewModel() {
+class JobListViewModel(private val firestoreRepository: FirestoreRepository) : ViewModel() {
     private val _jobs = MutableLiveData<List<DocumentSnapshot>>()
     val jobs: LiveData<List<DocumentSnapshot>> get() = _jobs
 
@@ -19,7 +19,7 @@ class JobListViewModel(private val repository: FirestoreRepository) : ViewModel(
 
     private fun getJobs() {
         viewModelScope.launch {
-            val fetchedJobs = repository.getJobs()
+            val fetchedJobs = firestoreRepository.getJobs()
             Log.d("JobListViewModel", "Fetched jobs: $fetchedJobs")
             _jobs.value = fetchedJobs
         }

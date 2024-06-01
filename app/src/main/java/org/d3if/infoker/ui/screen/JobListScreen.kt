@@ -71,7 +71,7 @@ fun JobListScreen(
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
     val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(authRepository, firestoreRepository))
 
-    val jobListViewModel: JobListViewModel = viewModel(factory = JobViewModelFactory(firestoreRepository))
+    val jobListViewModel: JobListViewModel = viewModel(factory = JobViewModelFactory(authRepository, firestoreRepository))
     val jobs by jobListViewModel.jobs.observeAsState(initial = emptyList())
 
     Scaffold(
@@ -110,7 +110,7 @@ fun JobListScreen(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         IconButton(
-                            onClick = { },
+                            onClick = { navController.navigate(Screen.Activity.route) },
                             modifier = Modifier
                                 .size(48.dp)
                                 .weight(1f)
@@ -121,7 +121,7 @@ fun JobListScreen(
                             )
                         }
                         IconButton(
-                            onClick = { },
+                            onClick = { navController.navigate(Screen.JobList.route) },
                             modifier = Modifier
                                 .size(48.dp)
                                 .weight(1f)
@@ -195,7 +195,6 @@ fun JobList(
     ) {
         items(jobs) { job ->
             JobListItem(job = job, onClick = {onClick(job)})
-//                Log.d("JobList", "Job ID clicked: $job.id")
         }
     }
 }
@@ -241,13 +240,13 @@ fun JobListItem(job: DocumentSnapshot, onClick: () -> Unit) {
                 Text(text = location, style = MaterialTheme.typography.titleSmall)
                 Text(text = stringResource(id = R.string.salary_format, salary), style = MaterialTheme.typography.titleSmall)
             }
-            Image(
-                painter = painterResource(id = R.drawable.baseline_bookmark_border_24),
-                contentDescription = "Bookmark",
-                modifier = Modifier
-                    .size(45.dp)
-                    .padding(8.dp)
-            )
+//            Image(
+//                painter = painterResource(id = R.drawable.baseline_bookmark_border_24),
+//                contentDescription = "Bookmark",
+//                modifier = Modifier
+//                    .size(45.dp)
+//                    .padding(8.dp)
+//            )
         }
     }
 }

@@ -1,7 +1,6 @@
 package org.d3if.infoker.ui.screen
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,7 +14,6 @@ import org.d3if.infoker.repository.FirestoreRepository
 
 class AuthViewModel(private val authRepository: AuthRepository, private val firestoreRepository: FirestoreRepository) : ViewModel() {
     private val _authResult = MutableLiveData<AuthResult<FirebaseUser>>()
-    val authResult: LiveData<AuthResult<FirebaseUser>> get() = _authResult
 
     init {
         checkCurrentUser()
@@ -41,7 +39,7 @@ class AuthViewModel(private val authRepository: AuthRepository, private val fire
 
             if (result is AuthResult.Success) {
                 viewModelScope.launch {
-                    val userAdded = firestoreRepository.addUser(email, name)
+                    val userAdded = firestoreRepository.addUser(name, email)
                     if (userAdded) {
                         updateUI(result.data, navController)
                         Log.d("AuthViewModel", "User added to Firestore")
@@ -64,7 +62,7 @@ class AuthViewModel(private val authRepository: AuthRepository, private val fire
         Log.d("AuthViewModel", "User logged out")
     }
 
-    fun checkCurrentUser() {
+    private fun checkCurrentUser() {
         val user = authRepository.getCurrentUser()
         _authResult.value = AuthResult.Success(user)
     }

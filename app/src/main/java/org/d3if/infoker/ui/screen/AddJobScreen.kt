@@ -29,13 +29,20 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.firestore.FirebaseFirestore
 import org.d3if.infoker.repository.FirestoreRepository
 import org.d3if.infoker.R
+import org.d3if.infoker.navigation.Screen
+import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.ui.theme.InfokerTheme
 import org.d3if.infoker.util.JobViewModelFactory
 
 @Composable
 fun AddJobScreen(navController: NavHostController) {
+    val authRepository = AuthRepository()
+    val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
+
     val addJobViewModel: AddJobViewModel =
-        viewModel(factory = JobViewModelFactory(FirestoreRepository(FirebaseFirestore.getInstance())))
+        viewModel(factory = JobViewModelFactory(authRepository, firestoreRepository))
+
+
 
     var title by remember {
         mutableStateOf("")
@@ -51,6 +58,12 @@ fun AddJobScreen(navController: NavHostController) {
 
     var description by remember {
         mutableStateOf("")
+    }
+
+    val currentUser = authRepository.getCurrentUser()
+
+    if (currentUser == null) {
+        navController.navigate(Screen.Login.route)
     }
 
     Scaffold { padding ->
