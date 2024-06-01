@@ -21,13 +21,11 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
@@ -59,6 +57,8 @@ import org.d3if.infoker.repository.FirestoreRepository
 import org.d3if.infoker.ui.theme.InfokerTheme
 import org.d3if.infoker.util.AuthViewModelFactory
 import org.d3if.infoker.util.JobViewModelFactory
+import java.text.DateFormat
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -201,7 +201,10 @@ fun JobListItem(job: DocumentSnapshot, onClick: () -> Unit) {
     val title = job.getString("title") ?: ""
     val location = job.getString("location") ?: ""
     val salary = job.getDouble("salary") ?: 0.0
-    val date = job.getDate("createdAt") ?: ""
+    val date = job.getDate("createdAt") ?: Date()
+
+    val formattedDate = DateFormat.getDateInstance().format(date)
+
 
     Box(
         modifier = Modifier
@@ -234,7 +237,7 @@ fun JobListItem(job: DocumentSnapshot, onClick: () -> Unit) {
                 Text(text = company, style = MaterialTheme.typography.titleMedium)
                 Text(text = location, style = MaterialTheme.typography.titleSmall)
                 Text(text = stringResource(id = R.string.salary_format, salary), style = MaterialTheme.typography.titleSmall)
-                Text(text = date.toString(), style = MaterialTheme.typography.titleSmall)
+                Text(text = formattedDate, style = MaterialTheme.typography.titleSmall)
             }
 //            Image(
 //                painter = painterResource(id = R.drawable.baseline_bookmark_border_24),

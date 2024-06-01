@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import org.d3if.infoker.R
 import org.d3if.infoker.navigation.Screen
@@ -59,6 +60,8 @@ import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
 import org.d3if.infoker.ui.theme.InfokerTheme
 import org.d3if.infoker.util.JobViewModelFactory
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -200,6 +203,8 @@ fun MyApplication(navController: NavHostController, modifier: Modifier = Modifie
 @Composable
 fun SavedApplicationsList(navController: NavHostController, viewModel: ActivityViewModel = viewModel()) {
     val bookmarks by viewModel.getBookmarksForCurrentUser().collectAsState(initial = emptyList())
+    val pattern = "dd MMM yyyy"
+    val dateFormat = SimpleDateFormat(pattern, Locale.getDefault())
 
     LazyColumn {
         if (bookmarks.isEmpty()) {
@@ -212,7 +217,8 @@ fun SavedApplicationsList(navController: NavHostController, viewModel: ActivityV
                 val jobId = jobData?.get("id") as? String ?: "N/A"
                 val title = jobData?.get("title") as? String ?: "N/A"
                 val company = jobData?.get("company") as? String ?: "Afta Tunas Jaya Abadi Tbk."
-                val date = jobData?.get("createdAt").toString()
+                val timestamp = jobData?.get("createdAt") as? Timestamp
+                val date = timestamp?.toDate()?.let { dateFormat.format(it) } ?: "N/A"
                 val location = jobData?.get("location") as? String ?: "N/A"
 
                 JobApplicationItem(
@@ -231,6 +237,8 @@ fun SavedApplicationsList(navController: NavHostController, viewModel: ActivityV
 @Composable
 fun AppliedApplicationsList(navController: NavHostController, viewModel: ActivityViewModel = viewModel()) {
     val applications by viewModel.getApplicationsForCurrentUser().collectAsState(initial = emptyList())
+    val pattern = "dd MMM yyyy"
+    val dateFormat = SimpleDateFormat(pattern, Locale.getDefault())
 
     LazyColumn {
         if (applications.isEmpty()) {
@@ -243,7 +251,8 @@ fun AppliedApplicationsList(navController: NavHostController, viewModel: Activit
                 val jobId = jobData?.get("id") as? String ?: "N/A"
                 val title = jobData?.get("title") as? String ?: "N/A"
                 val company = jobData?.get("company") as? String ?: "Afta Tunas Jaya Abadi Tbk."
-                val date = jobData?.get("createdAt").toString()
+                val timestamp = jobData?.get("createdAt") as? Timestamp
+                val date = timestamp?.toDate()?.let { dateFormat.format(it) } ?: "N/A"
                 val location = jobData?.get("location") as? String ?: "N/A"
                 val status = "Dilamar di situs perusahaan"
                 val statusDate = "10 Jan 2023"
