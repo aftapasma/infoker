@@ -14,9 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -52,6 +49,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.firestore.FirebaseFirestore
+import org.d3if.infoker.R
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
 import org.d3if.infoker.ui.theme.InfokerTheme
@@ -69,7 +67,7 @@ fun RegisterScreen(navController: NavHostController) {
     var password by rememberSaveable { mutableStateOf("") }
     var passwordConfirm by rememberSaveable { mutableStateOf("") }
 
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
 
     DisposableEffect(Unit) {
         val observer = LifecycleEventObserver { _, event ->
@@ -355,7 +353,7 @@ fun RegisterPassword(password: String, onPasswordChange: (String) -> Unit) {
         trailingIcon = {
             IconButton(onClick = { passwordHidden = !passwordHidden }) {
                 Icon(
-                    imageVector = if (passwordHidden) Icons.Default.Check else Icons.Default.Clear,
+                    painter = painterResource(id = if (passwordHidden) R.drawable.baseline_visibility_off_24 else R.drawable.baseline_visibility_24),
                     contentDescription = if (passwordHidden) "Show password" else "Hide password"
                 )
             }
@@ -388,7 +386,7 @@ fun RegisterPasswordConfirm(passwordConfirm: String, onPasswordConfirmChange: (S
         trailingIcon = {
             IconButton(onClick = { passwordHidden = !passwordHidden }) {
                 Icon(
-                    imageVector = if (passwordHidden) Icons.Default.Check else Icons.Default.Clear,
+                    painter = painterResource(id = if (passwordHidden) R.drawable.baseline_visibility_off_24 else R.drawable.baseline_visibility_24),
                     contentDescription = if (passwordHidden) "Show password" else "Hide password"
                 )
             }

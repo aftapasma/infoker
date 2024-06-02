@@ -14,9 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -37,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -50,6 +48,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.firestore.FirebaseFirestore
+import org.d3if.infoker.R
 import org.d3if.infoker.navigation.Screen
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
@@ -60,7 +59,8 @@ import org.d3if.infoker.util.AuthViewModelFactory
 fun LoginScreen(navController: NavHostController) {
     val authRepository = AuthRepository()
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
-    val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(authRepository, firestoreRepository))
+    val authViewModel: AuthViewModel =
+        viewModel(factory = AuthViewModelFactory(authRepository, firestoreRepository))
     val context = LocalContext.current
 
     var email by rememberSaveable { mutableStateOf("") }
@@ -122,7 +122,8 @@ fun LoginScreen(navController: NavHostController) {
                     roundedCornerShape = RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp),
                     onClick = {
                         authViewModel.signIn(email, password, navController)
-                        Toast.makeText(context, "Attempting to sign in...", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Attempting to sign in...", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 )
 
@@ -195,7 +196,10 @@ fun LoginTextField(email: String, onEmailChange: (String) -> Unit) {
             )
         },
         placeholder = { Text(text = "Email Address") },
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Email),
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Email
+        ),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = MaterialTheme.colorScheme.primary,
             unfocusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -220,7 +224,10 @@ fun PasswordTextField(password: String, onPasswordChange: (String) -> Unit) {
             )
         },
         visualTransformation = if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Password
+        ),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = MaterialTheme.colorScheme.primary,
             unfocusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -228,7 +235,7 @@ fun PasswordTextField(password: String, onPasswordChange: (String) -> Unit) {
         trailingIcon = {
             IconButton(onClick = { passwordHidden = !passwordHidden }) {
                 Icon(
-                    imageVector = if (passwordHidden) Icons.Default.Check else Icons.Default.Clear,
+                    painter = painterResource(id = if (passwordHidden) R.drawable.baseline_visibility_off_24 else R.drawable.baseline_visibility_24),
                     contentDescription = if (passwordHidden) "Show password" else "Hide password"
                 )
             }
