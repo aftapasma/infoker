@@ -68,6 +68,13 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.androidx.runtime.livedata)
 
+    implementation(libs.androidx.material.icons.core)
+    implementation(libs.androidx.foundation)
+    implementation(libs.ui.tooling)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.constraintlayout.compose)
+    implementation(libs.material3)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
