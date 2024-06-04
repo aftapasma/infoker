@@ -35,10 +35,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import org.d3if.infoker.ui.screen.component.UserBottomBar
 import org.d3if.infoker.ui.theme.InfokerTheme
 
 @Composable
-fun Profile2() {
+fun Profile2(navController: NavHostController) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
     Column(
@@ -57,6 +60,7 @@ fun Profile2() {
 //            2 -> Education()
             // Tambah kalo kurang
         }
+        UserBottomBar(navController = navController)
     }
 }
 
@@ -253,6 +257,6 @@ fun CareerHistory() {
 @Composable
 fun Profile2Preview() {
     InfokerTheme {
-        Profile2()
+        Profile2(rememberNavController())
     }
 }
