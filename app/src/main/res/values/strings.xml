@@ -8,4 +8,5 @@
     <string name="salary_format">Rp %1$.2f</string>
     <string name="activity">My Activity</string>
     <string name="tambah_pekerjaan">Tambah pekerjaan</string>
+    <string name="hapus">Hapus</string>
 </resources>
