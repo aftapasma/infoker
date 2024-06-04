@@ -1,4 +1,4 @@
-package org.d3if.infoker.screen.perusahaan.tabs
+package org.d3if.infoker.ui.screen.perusahaan.tabs
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement

@@ -7,11 +7,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import org.d3if.infoker.ui.screen.ActivityScreen
-import org.d3if.infoker.ui.screen.AddJobScreen
-import org.d3if.infoker.ui.screen.JobDetailScreen
-import org.d3if.infoker.ui.screen.JobListScreen
-import org.d3if.infoker.ui.screen.KEY_JOB_ID
+import org.d3if.infoker.ui.screen.user.ActivityScreen
+import org.d3if.infoker.ui.screen.perusahaan.AddJobScreen
+import org.d3if.infoker.ui.screen.user.JobDetailScreen
+import org.d3if.infoker.ui.screen.user.JobListScreen
+import org.d3if.infoker.ui.screen.user.KEY_JOB_ID
 import org.d3if.infoker.ui.screen.LoginScreen
 import org.d3if.infoker.ui.screen.RegisterScreen
 
@@ -50,6 +50,9 @@ fun SetUpNavGraph(navController: NavHostController = rememberNavController()) {
         }
         composable(route = Screen.Activity.route) {
             ActivityScreen(navController)
+        }
+        composable(route = Screen.Profile.route) {
+
         }
     }
 

@@ -1,4 +1,4 @@
-package org.d3if.infoker.screen.perusahaan.nav
+package org.d3if.infoker.ui.screen.perusahaan.nav
 
 object NavTitle {
     const val HOME = "Home"

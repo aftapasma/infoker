@@ -1,4 +1,4 @@
-package org.d3if.infoker.screen.perusahaan.nav
+package org.d3if.infoker.ui.screen.perusahaan.nav
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home

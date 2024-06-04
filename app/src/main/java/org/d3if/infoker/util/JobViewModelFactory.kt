@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
-import org.d3if.infoker.ui.screen.ActivityViewModel
-import org.d3if.infoker.ui.screen.AddJobViewModel
-import org.d3if.infoker.ui.screen.JobDetailViewModel
-import org.d3if.infoker.ui.screen.JobListViewModel
+import org.d3if.infoker.ui.screen.user.ActivityViewModel
+import org.d3if.infoker.ui.screen.perusahaan.AddJobViewModel
+import org.d3if.infoker.ui.screen.user.JobDetailViewModel
+import org.d3if.infoker.ui.screen.user.JobListViewModel
 
 class JobViewModelFactory(private val authRepository: AuthRepository, private val firestoreRepository: FirestoreRepository) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")

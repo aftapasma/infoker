@@ -1,4 +1,4 @@
-package org.d3if.infoker.ui.screen
+package org.d3if.infoker.ui.screen.user
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -54,6 +54,7 @@ import org.d3if.infoker.R
 import org.d3if.infoker.navigation.Screen
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
+import org.d3if.infoker.ui.screen.AuthViewModel
 import org.d3if.infoker.ui.theme.InfokerTheme
 import org.d3if.infoker.util.AuthViewModelFactory
 import org.d3if.infoker.util.JobViewModelFactory

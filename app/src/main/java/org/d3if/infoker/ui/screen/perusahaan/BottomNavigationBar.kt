@@ -1,4 +1,4 @@
-package org.d3if.infoker.screen.perusahaan
+package org.d3if.infoker.ui.screen.perusahaan
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -10,7 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
-import org.d3if.infoker.screen.perusahaan.nav.NavItem
+import org.d3if.infoker.ui.screen.perusahaan.nav.NavItem
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {

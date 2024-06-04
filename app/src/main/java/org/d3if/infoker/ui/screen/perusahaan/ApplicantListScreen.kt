@@ -1,4 +1,4 @@
-package org.d3if.infoker.ui.screen
+package org.d3if.infoker.ui.screen.perusahaan
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image

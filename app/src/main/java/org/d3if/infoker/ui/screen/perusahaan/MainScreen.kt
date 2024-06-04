@@ -1,4 +1,4 @@
-package org.d3if.infoker.screen.perusahaan
+package org.d3if.infoker.ui.screen.perusahaan
 
 import android.annotation.SuppressLint
 import androidx.compose.material3.BottomAppBar

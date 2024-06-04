@@ -1,4 +1,4 @@
-package org.d3if.infoker.screen.perusahaan.tabs
+package org.d3if.infoker.ui.screen.perusahaan.tabs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

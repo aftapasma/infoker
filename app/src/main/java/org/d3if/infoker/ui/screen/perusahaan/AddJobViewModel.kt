@@ -1,4 +1,4 @@
-package org.d3if.infoker.ui.screen
+package org.d3if.infoker.ui.screen.perusahaan
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

@@ -1,4 +1,4 @@
-package org.d3if.infoker.ui.screen
+package org.d3if.infoker.ui.screen.user
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
