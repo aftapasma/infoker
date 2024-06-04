@@ -36,13 +36,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import org.checkerframework.checker.units.qual.C
 import org.d3if.infoker.R
+import org.d3if.infoker.navigation.Screen
+import org.d3if.infoker.ui.screen.component.CompanyBottomBar
 import org.d3if.infoker.ui.theme.InfokerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavHostController) {
 
     Scaffold(
         topBar = {
@@ -59,6 +63,7 @@ fun HomeScreen() {
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
+                navController.navigate(Screen.AddJob.route)
             }) {
                 Icon(
                     imageVector = Icons.Filled.Add,
@@ -66,6 +71,9 @@ fun HomeScreen() {
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
+        },
+        bottomBar = {
+            CompanyBottomBar(navController = navController)
         }
     ) {padding ->
         ScreenContent(Modifier.padding(padding))
@@ -126,6 +134,6 @@ fun ListItem() {
 @Composable
 fun PreviewHomeScreen() {
     InfokerTheme {
-        HomeScreen()
+        HomeScreen(rememberNavController())
     }
 }

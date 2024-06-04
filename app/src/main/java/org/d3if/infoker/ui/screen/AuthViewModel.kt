@@ -82,7 +82,7 @@ class AuthViewModel(private val authRepository: AuthRepository, private val fire
                                 Log.d("AuthViewModel", "User moved to JobListScreen")
                             }
                             "company" -> {
-                                navController.navigate(Screen.Main.route) {
+                                navController.navigate(Screen.Home.route) {
                                     popUpTo(Screen.Login.route) { inclusive = true }
                                 }
                                 Log.d("AuthViewModel", "User moved to MainScreen")

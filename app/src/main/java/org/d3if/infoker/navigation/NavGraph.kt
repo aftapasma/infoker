@@ -14,10 +14,9 @@ import org.d3if.infoker.ui.screen.user.JobListScreen
 import org.d3if.infoker.ui.screen.user.KEY_JOB_ID
 import org.d3if.infoker.ui.screen.LoginScreen
 import org.d3if.infoker.ui.screen.RegisterScreen
-import org.d3if.infoker.ui.screen.perusahaan.MainScreen
 import org.d3if.infoker.ui.screen.perusahaan.tabs.HomeScreen
 import org.d3if.infoker.ui.screen.perusahaan.tabs.ListScreen
-import org.d3if.infoker.ui.screen.perusahaan.tabs.ProfileScreen
+import org.d3if.infoker.ui.screen.user.ProfilScreen
 import org.d3if.infoker.ui.screen.user.Profile2
 
 @Composable
@@ -59,18 +58,15 @@ fun SetUpNavGraph(navController: NavHostController = rememberNavController()) {
         composable(route = Screen.Profile.route) {
             Profile2(navController)
         }
-//        composable(route = Screen.Home.route) {
-//            HomeScreen(navController)
-//        }
-//        composable(route = Screen.List.route) {
-//            ListScreen(navController)
-//        }
-//        composable(route = Screen.CompanyProfile.route) {
-//            ProfileScreen(navController)
-//        }
-            composable(route = Screen.Main.route) {
-                MainScreen(navController)
-            }
+        composable(route = Screen.Home.route) {
+            HomeScreen(navController)
+        }
+        composable(route = Screen.List.route) {
+            ListScreen(navController)
+        }
+        composable(route = Screen.CompanyProfile.route) {
+            ProfilScreen()
+        }
     }
 
 //    LaunchedEffect(authResult) {

@@ -44,8 +44,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import org.d3if.infoker.R
 import org.d3if.infoker.navigation.Screen
+import org.d3if.infoker.ui.screen.component.CompanyBottomBar
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -89,7 +91,7 @@ val dummyRejectedApplicants = listOf(
 )
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListScreen(navController: NavHostController? = null) {
+fun ListScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -116,6 +118,9 @@ fun ListScreen(navController: NavHostController? = null) {
                 )
             }
         },
+        bottomBar = {
+            CompanyBottomBar(navController = navController)
+        }
     )
 }
 
@@ -281,5 +286,5 @@ fun JobApplicationItem(
 @Preview(showBackground = true)
 @Composable
 fun PreviewApplicantDetailListScreen() {
-    ListScreen()
+    ListScreen(rememberNavController())
 }
