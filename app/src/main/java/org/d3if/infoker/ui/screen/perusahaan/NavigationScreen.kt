@@ -11,9 +11,9 @@ import org.d3if.infoker.ui.screen.perusahaan.tabs.ProfileScreen
 
 @Composable
 fun NavigationScreen(navController: NavHostController) {
-    NavHost(navController, startDestination = NavItem.Home.path) {
-        composable(NavItem.Home.path) { HomeScreen() }
-        composable(NavItem.List.path) { ListScreen() }
-        composable(NavItem.Profile.path) { ProfileScreen() }
+    NavHost(navController, startDestination = NavItem.Home.route) {
+        composable(NavItem.Home.route) { HomeScreen() }
+        composable(NavItem.List.route) { ListScreen() }
+        composable(NavItem.Profile.route) { ProfileScreen() }
     }
 }

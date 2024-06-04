@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import org.d3if.infoker.ui.screen.perusahaan.MainScreen
+import org.d3if.infoker.ui.screen.user.JobListScreen
 import org.d3if.infoker.ui.theme.InfokerTheme
 
 class MainActivity : ComponentActivity() {
@@ -25,7 +26,7 @@ class MainActivity : ComponentActivity() {
             InfokerTheme {
                 val navController = rememberNavController()
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    MainScreen(navController = navController)
+                    JobListScreen(navController = navController)
                 }
             }
         }

@@ -21,12 +21,12 @@ fun BottomNavigationBar(navController: NavHostController) {
         navItems.forEachIndexed { index, item ->
             NavigationBarItem(
                 alwaysShowLabel = true,
-                icon = { Icon(item.icon, contentDescription = item.title) },
-                label = { Text(item.title) },
+                icon = { item.icon?.let { Icon(it, contentDescription = item.title) } },
+                label = { item.title?.let { Text(it) } },
                 selected = selectedItem == index,
                 onClick = {
                     selectedItem = index
-                    navController.navigate(item.path) {
+                    navController.navigate(item.route) {
                         navController.graph.startDestinationRoute?.let { route ->
                             popUpTo(route) { saveState = true }
                         }

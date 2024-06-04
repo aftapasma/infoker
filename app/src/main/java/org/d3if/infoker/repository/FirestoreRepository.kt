@@ -101,6 +101,11 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
         }
     }
 
+    suspend fun getUserRoleByEmail(email: String): String? {
+        val user = getUserByEmail(email)
+        return user?.getString("role")
+    }
+
     suspend fun applyForJob(user: DocumentSnapshot, job: DocumentSnapshot): Boolean {
         val jobData = job.data?.toMutableMap() ?: mutableMapOf()
         jobData["id"] = job.id

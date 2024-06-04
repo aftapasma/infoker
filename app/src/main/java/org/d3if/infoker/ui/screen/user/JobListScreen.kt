@@ -55,6 +55,7 @@ import org.d3if.infoker.navigation.Screen
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
 import org.d3if.infoker.ui.screen.AuthViewModel
+import org.d3if.infoker.ui.screen.component.UserBottomBar
 import org.d3if.infoker.ui.theme.InfokerTheme
 import org.d3if.infoker.util.AuthViewModelFactory
 import org.d3if.infoker.util.JobViewModelFactory
@@ -109,48 +110,7 @@ fun JobListScreen(
             )
         },
         bottomBar = {
-            BottomAppBar(
-                content = {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        IconButton(
-                            onClick = { navController.navigate(Screen.Activity.route) },
-                            modifier = Modifier
-                                .size(48.dp)
-                                .weight(1f)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_bookmark_border_24),
-                                contentDescription = "Bookmark"
-                            )
-                        }
-                        IconButton(
-                            onClick = { navController.navigate(Screen.JobList.route) },
-                            modifier = Modifier
-                                .size(48.dp)
-                                .weight(1f)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Home,
-                                contentDescription = "Home"
-                            )
-                        }
-                        IconButton(
-                            onClick = { },
-                            modifier = Modifier
-                                .size(48.dp)
-                                .weight(1f)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.AccountCircle,
-                                contentDescription = "Account"
-                            )
-                        }
-                    }
-                }
-            )
+            UserBottomBar(navController = navController)
         },
         content = { paddingValues ->
             Column(

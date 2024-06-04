@@ -69,15 +69,37 @@ class AuthViewModel(private val authRepository: AuthRepository, private val fire
 
     private fun updateUI(user: FirebaseUser?, navController: NavHostController) {
         if (user != null) {
-            navController.navigate(Screen.JobList.route) {
-                popUpTo(Screen.Login.route) { inclusive = true }
+            val email = user.email
+            if (email != null) {
+                viewModelScope.launch {
+                    val role = firestoreRepository.getUserRoleByEmail(email)
+                    role?.let {
+                        when (it) {
+                            "user" -> {
+                                navController.navigate(Screen.JobList.route) {
+                                    popUpTo(Screen.Login.route) { inclusive = true }
+                                }
+                                Log.d("AuthViewModel", "User moved to JobListScreen")
+                            }
+                            "company" -> {
+                                navController.navigate(Screen.Main.route) {
+                                    popUpTo(Screen.Login.route) { inclusive = true }
+                                }
+                                Log.d("AuthViewModel", "User moved to MainScreen")
+                            }
+                            else -> {
+                                // Handle unknown role
+                                Log.d("AuthViewModel", "Unknown role: $role")
+                            }
+                        }
+                    }
+                }
             }
-            Log.d("AuthViewModel", "User moved to home screen")
         } else {
             navController.navigate(Screen.Login.route) {
                 popUpTo(Screen.JobList.route) { inclusive = true }
             }
-            Log.d("AuthViewModel", "User not moved to home screen")
+            Log.d("AuthViewModel", "User not logged in")
         }
     }
 }
