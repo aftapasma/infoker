@@ -56,7 +56,7 @@ fun Profile2() {
         when (selectedTabIndex) {
             0 -> Personal()
             1 -> CareerHistory()
-            2 -> Education()
+//            2 -> Education()
             // Tambah kalo kurang
         }
     }
@@ -96,7 +96,7 @@ fun HeaderSection() {
 
 @Composable
 fun Tab(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
-    val tabs = listOf("Tentang Kamu", "Riwayat kerja", "Pendidikan")
+    val tabs = listOf("Tentang Kamu", "Upload CV")
 
     TabRow(
         selectedTabIndex = selectedTabIndex,
@@ -170,7 +170,7 @@ fun CareerHistory() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Career history",
+                text = "Upload CV",
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 color = Color.White
@@ -220,37 +220,37 @@ fun CareerHistory() {
     }
 }
 // tampilan sebelum klik tombol tambah
-@Composable
-fun Education() {
-    Column {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Education",
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                color = Color.White
-            )
-
-        }
-        Text(
-            text = "Beritahu Perusahaan tentang pendidikan anda",
-            color = Color.Gray,
-            modifier = Modifier.padding( 4.dp)
-        )
-        OutlinedButton(
-            onClick = { /*Tambah pendidikan*/ },
-            modifier = Modifier.padding(top = 16.dp)
-        ) {
-            Text(text = "Tambah Pendidikan", color = Color.White)
-        }
-    }
-}
+//@Composable
+//fun Education() {
+//    Column {
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(8.dp),
+//            horizontalArrangement = Arrangement.SpaceBetween,
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            Text(
+//                text = "Education",
+//                fontWeight = FontWeight.Bold,
+//                fontSize = 16.sp,
+//                color = Color.White
+//            )
+//
+//        }
+//        Text(
+//            text = "Beritahu Perusahaan tentang pendidikan anda",
+//            color = Color.Gray,
+//            modifier = Modifier.padding( 4.dp)
+//        )
+//        OutlinedButton(
+//            onClick = { /*Tambah pendidikan*/ },
+//            modifier = Modifier.padding(top = 16.dp)
+//        ) {
+//            Text(text = "Tambah Pendidikan", color = Color.White)
+//        }
+//    }
+//}
 @Preview(showBackground = true)
 @Composable
 fun Profile2Preview() {
