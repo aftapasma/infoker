@@ -1,6 +1,8 @@
 package org.d3if.infoker.ui.screen
 
+import android.app.Activity
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -65,6 +67,12 @@ fun LoginScreen(navController: NavHostController) {
 
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
+
+    val activity = LocalContext.current as? Activity
+
+    BackHandler {
+        activity?.finish()
+    }
 
 //    val lifecycleOwner = LocalLifecycleOwner.current
 

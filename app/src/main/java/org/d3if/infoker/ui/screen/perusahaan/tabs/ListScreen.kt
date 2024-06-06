@@ -118,9 +118,9 @@ fun ListScreen(navController: NavHostController) {
                 )
             }
         },
-        bottomBar = {
-            CompanyBottomBar(navController = navController)
-        }
+//        bottomBar = {
+//            CompanyBottomBar(navController = navController)
+//        }
     )
 }
 

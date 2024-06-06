@@ -1,6 +1,8 @@
 package org.d3if.infoker.ui.screen.perusahaan.tabs
 
+import android.app.Activity
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,23 +32,39 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.firestore.FirebaseFirestore
 import org.checkerframework.checker.units.qual.C
 import org.d3if.infoker.R
 import org.d3if.infoker.navigation.Screen
+import org.d3if.infoker.repository.AuthRepository
+import org.d3if.infoker.repository.FirestoreRepository
+import org.d3if.infoker.ui.screen.AuthViewModel
 import org.d3if.infoker.ui.screen.component.CompanyBottomBar
 import org.d3if.infoker.ui.theme.InfokerTheme
+import org.d3if.infoker.util.AuthViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavHostController) {
+    val authRepository = AuthRepository()
+    val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
+    val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(authRepository, firestoreRepository))
+
+    val activity = LocalContext.current as? Activity
+
+    BackHandler {
+        activity?.finish()
+    }
 
     Scaffold(
         topBar = {
@@ -76,23 +94,23 @@ fun HomeScreen(navController: NavHostController) {
             CompanyBottomBar(navController = navController)
         }
     ) {padding ->
-        ScreenContent(Modifier.padding(padding))
+        ScreenContent(authViewModel, navController, Modifier.padding(padding))
         }
 
 }
 
 @Composable
-fun ScreenContent(modifier: Modifier){
+fun ScreenContent(authViewModel: AuthViewModel, navController: NavHostController, modifier: Modifier){
     Column(
         modifier = modifier.fillMaxSize(),
 
     ) {
-        ListItem()
+        ListItem(authViewModel, navController)
     }
 }
 
 @Composable
-fun ListItem() {
+fun ListItem(authViewModel: AuthViewModel, navController: NavHostController) {
 
     Card(
         onClick = {},
@@ -117,7 +135,7 @@ fun ListItem() {
                     text = "Ireng",
                 )
             }
-            IconButton(onClick = { /* Edit action */ }) {
+            IconButton(onClick = { authViewModel.logout(navController) }) {
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = "Edit"

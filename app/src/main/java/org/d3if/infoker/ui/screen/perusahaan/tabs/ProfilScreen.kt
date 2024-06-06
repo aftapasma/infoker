@@ -81,6 +81,7 @@ fun HeaderCompany() {
             )
             Text(text = "jawir@email")
         }
+
     }
 }
 
