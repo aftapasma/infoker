@@ -14,6 +14,7 @@ import org.d3if.infoker.repository.FirestoreRepository
 
 class AuthViewModel(private val authRepository: AuthRepository, private val firestoreRepository: FirestoreRepository) : ViewModel() {
     private val _authResult = MutableLiveData<AuthResult<FirebaseUser>>()
+    val authResult: MutableLiveData<AuthResult<FirebaseUser>> get() = _authResult
 
     init {
         checkCurrentUser()

@@ -1,12 +1,22 @@
 package org.d3if.infoker.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.firebase.firestore.FirebaseFirestore
+import org.d3if.infoker.repository.AuthRepository
+import org.d3if.infoker.repository.FirestoreRepository
+import org.d3if.infoker.ui.screen.AuthViewModel
 import org.d3if.infoker.ui.screen.user.ActivityScreen
 import org.d3if.infoker.ui.screen.perusahaan.AddJobScreen
 import org.d3if.infoker.ui.screen.user.JobDetailScreen
@@ -18,19 +28,28 @@ import org.d3if.infoker.ui.screen.perusahaan.tabs.HomeScreen
 import org.d3if.infoker.ui.screen.perusahaan.tabs.ListScreen
 import org.d3if.infoker.ui.screen.user.ProfilScreen
 import org.d3if.infoker.ui.screen.user.Profile2
+import org.d3if.infoker.util.AuthViewModelFactory
 
 @Composable
 fun SetUpNavGraph(navController: NavHostController = rememberNavController()) {
-//    val authRepository = AuthRepository()
-//    val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
-//    val authViewModel: AuthViewModel =
-//        viewModel(factory = AuthViewModelFactory(authRepository, firestoreRepository))
+    val authRepository = AuthRepository()
+    val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
+    val authViewModel: AuthViewModel =
+        viewModel(factory = AuthViewModelFactory(authRepository, firestoreRepository))
 
-//    val authResult by authViewModel.authResult.observeAsState()
+    var startDestination by remember { mutableStateOf(Screen.JobList.route) }
+
+    LaunchedEffect(Unit) {
+        val user = authRepository.getCurrentUser()
+        if (user != null) {
+            val role = firestoreRepository.getUserRoleByEmail(user.email!!)
+            startDestination = if (role == "company") Screen.Home.route else Screen.JobList.route
+        }
+    }
 
     NavHost(
         navController = navController,
-        startDestination = Screen.JobList.route
+        startDestination = startDestination
     ) {
         composable(route = Screen.Register.route) {
             RegisterScreen(navController)
