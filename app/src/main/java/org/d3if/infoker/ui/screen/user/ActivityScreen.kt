@@ -1,32 +1,25 @@
 package org.d3if.infoker.ui.screen.user
 
 import android.content.res.Configuration
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -43,7 +36,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -104,7 +96,6 @@ fun ActivityScreen(navController: NavHostController) {
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MyApplication(navController: NavHostController, modifier: Modifier = Modifier) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
@@ -153,15 +144,15 @@ fun MyApplication(navController: NavHostController, modifier: Modifier = Modifie
                 .weight(1f)
         ) {
             when (selectedTabIndex) {
-                0 -> SavedApplicationsList(navController)
-                1 -> AppliedApplicationsList(navController)
+                0 -> SavedApplicationsList(navController, activityViewModel)
+                1 -> AppliedApplicationsList(navController, activityViewModel)
             }
         }
     }
 }
 
 @Composable
-fun SavedApplicationsList(navController: NavHostController, viewModel: ActivityViewModel = viewModel()) {
+fun SavedApplicationsList(navController: NavHostController, viewModel: ActivityViewModel) {
     val bookmarks by viewModel.getBookmarksForCurrentUser().collectAsState(initial = emptyList())
     val pattern = "dd MMM yyyy"
     val dateFormat = SimpleDateFormat(pattern, Locale.getDefault())
@@ -195,7 +186,7 @@ fun SavedApplicationsList(navController: NavHostController, viewModel: ActivityV
 }
 
 @Composable
-fun AppliedApplicationsList(navController: NavHostController, viewModel: ActivityViewModel = viewModel()) {
+fun AppliedApplicationsList(navController: NavHostController, viewModel: ActivityViewModel) {
     val applications by viewModel.getApplicationsForCurrentUser().collectAsState(initial = emptyList())
     val pattern = "dd MMM yyyy"
     val dateFormat = SimpleDateFormat(pattern, Locale.getDefault())
@@ -214,7 +205,7 @@ fun AppliedApplicationsList(navController: NavHostController, viewModel: Activit
                 val timestamp = jobData?.get("createdAt") as? Timestamp
                 val date = timestamp?.toDate()?.let { dateFormat.format(it) } ?: "N/A"
                 val location = jobData?.get("location") as? String ?: "N/A"
-                val status = "Dilamar di situs perusahaan"
+                val status = document.get("status").toString()
                 val statusDate = "10 Jan 2023"
 
                 JobApplicationItem(
@@ -272,7 +263,7 @@ fun JobApplicationItem(
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             if (status != null && statusDate != null) {
-                Divider()
+                HorizontalDivider()
                 Text(
                     text = status,
                     modifier = Modifier.padding(vertical = 8.dp)

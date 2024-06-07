@@ -112,7 +112,8 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
         return try {
             val applicationMap = hashMapOf(
                 "user" to user.data,
-                "job" to jobData
+                "job" to jobData,
+                "status" to "Applied"
             )
             db.collection("applications").add(applicationMap).await()
             Log.d("FirestoreRepository", "Application added to Firestore.")
