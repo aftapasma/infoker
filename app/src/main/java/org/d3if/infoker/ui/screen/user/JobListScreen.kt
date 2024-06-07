@@ -58,7 +58,7 @@ import org.d3if.infoker.ui.screen.AuthViewModel
 import org.d3if.infoker.ui.screen.component.UserBottomBar
 import org.d3if.infoker.ui.theme.InfokerTheme
 import org.d3if.infoker.util.AuthViewModelFactory
-import org.d3if.infoker.util.JobViewModelFactory
+import org.d3if.infoker.util.ViewModelFactory
 import java.text.DateFormat
 import java.util.Date
 
@@ -74,7 +74,7 @@ fun JobListScreen(
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
     val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(authRepository, firestoreRepository))
 
-    val jobListViewModel: JobListViewModel = viewModel(factory = JobViewModelFactory(authRepository, firestoreRepository))
+    val jobListViewModel: JobListViewModel = viewModel(factory = ViewModelFactory(authRepository, firestoreRepository))
     val jobs by jobListViewModel.jobs.observeAsState(initial = emptyList())
 
     LaunchedEffect(text) {

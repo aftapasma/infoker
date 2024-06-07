@@ -11,14 +11,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -30,35 +27,39 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import org.checkerframework.checker.units.qual.C
 import org.d3if.infoker.R
 import org.d3if.infoker.navigation.Screen
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
-import org.d3if.infoker.ui.screen.AuthViewModel
 import org.d3if.infoker.ui.screen.component.CompanyBottomBar
 import org.d3if.infoker.ui.theme.InfokerTheme
-import org.d3if.infoker.util.AuthViewModelFactory
+import org.d3if.infoker.util.ViewModelFactory
+import java.text.DateFormat
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavHostController) {
     val authRepository = AuthRepository()
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
-    val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(authRepository, firestoreRepository))
+    val homeViewModel: HomeViewModel = viewModel(factory = ViewModelFactory(authRepository, firestoreRepository))
+
+    LaunchedEffect(Unit) {
+        homeViewModel.getJobs()
+    }
 
     val activity = LocalContext.current as? Activity
 
@@ -93,56 +94,59 @@ fun HomeScreen(navController: NavHostController) {
         bottomBar = {
             CompanyBottomBar(navController = navController)
         }
-    ) {padding ->
-        ScreenContent(authViewModel, navController, Modifier.padding(padding))
+    ) { padding ->
+        ScreenContent(homeViewModel, navController, Modifier.padding(padding))
         }
 
 }
 
 @Composable
-fun ScreenContent(authViewModel: AuthViewModel, navController: NavHostController, modifier: Modifier){
-    Column(
-        modifier = modifier.fillMaxSize(),
+fun ScreenContent(homeViewModel: HomeViewModel, navController: NavHostController, modifier: Modifier){
+    val jobs by homeViewModel.companyJobs.observeAsState(initial = emptyList())
 
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        ListItem(authViewModel, navController)
+        items(jobs) { job ->
+            ListItem(job, navController)
+        }
     }
 }
 
 @Composable
-fun ListItem(authViewModel: AuthViewModel, navController: NavHostController) {
+fun ListItem(job: DocumentSnapshot, navController: NavHostController) {
+    val title = job.getString("title")
+    val location = job.getString("location")
+    val date = job.getDate("createdAt") ?: Date()
+
+    val formattedDate = DateFormat.getDateInstance().format(date)
 
     Card(
-        onClick = {},
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-//            backgroundColor = Color(0xFF1E1E1E)
+            .clickable { /* Handle job click */ }
+            .padding(8.dp)
     ) {
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(
-                modifier = Modifier.padding(8.dp)
-            ) {
-                Text(text = "WOi", style = MaterialTheme.typography.titleLarge)
-                Text(text = "Jawir", style = MaterialTheme.typography.titleMedium)
-                Text(
-                    text = "Ireng",
-                )
+            Column(modifier = Modifier.padding(8.dp)) {
+                Text(text = title ?: "Unknown", style = MaterialTheme.typography.titleLarge)
+                Text(text = location ?: "Unknown", style = MaterialTheme.typography.titleMedium)
+                Text(text = formattedDate, style = MaterialTheme.typography.bodyMedium)
             }
-            IconButton(onClick = { authViewModel.logout(navController) }) {
+            IconButton(onClick = { /* Handle edit */ }) {
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = "Edit"
                 )
             }
         }
-
     }
 }
 

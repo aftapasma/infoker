@@ -36,7 +36,7 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
     }
 
 
-    suspend fun getJobs(): List<DocumentSnapshot> {
+    suspend fun getAllJobs(): List<DocumentSnapshot> {
         return try {
             val docRef = db.collection("jobs")
             val result = docRef.get().await()
@@ -52,6 +52,26 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
             }
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "Error getting jobs", e)
+            emptyList()
+        }
+    }
+
+    suspend fun getJobsByCompany(email: String): List<DocumentSnapshot> {
+        return try {
+            val querySnapshot = db.collection("jobs")
+                .whereEqualTo("createdBy.email", email)
+                .get()
+                .await()
+
+            if (querySnapshot.isEmpty) {
+                Log.d("FirestoreRepository", "No jobs found for user: $email")
+                emptyList()
+            } else {
+                Log.d("FirestoreRepository", "Jobs found: ${querySnapshot.documents.size}")
+                querySnapshot.documents
+            }
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Error getting jobs by user email", e)
             emptyList()
         }
     }

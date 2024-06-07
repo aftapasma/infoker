@@ -39,7 +39,7 @@ import org.d3if.infoker.R
 import org.d3if.infoker.navigation.Screen
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
-import org.d3if.infoker.util.JobViewModelFactory
+import org.d3if.infoker.util.ViewModelFactory
 
 const val KEY_JOB_ID = "jobId"
 
@@ -50,7 +50,7 @@ fun JobDetailScreen(navController: NavHostController, id: String?) {
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
     val authRepository = AuthRepository()
 
-    val jobDetailViewModel: JobDetailViewModel = viewModel(factory = JobViewModelFactory(authRepository, firestoreRepository))
+    val jobDetailViewModel: JobDetailViewModel = viewModel(factory = ViewModelFactory(authRepository, firestoreRepository))
     LaunchedEffect(id) {
         id?.let { jobDetailViewModel.getJobById(it) }
     }

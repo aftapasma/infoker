@@ -53,7 +53,7 @@ import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
 import org.d3if.infoker.ui.screen.component.UserBottomBar
 import org.d3if.infoker.ui.theme.InfokerTheme
-import org.d3if.infoker.util.JobViewModelFactory
+import org.d3if.infoker.util.ViewModelFactory
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -117,7 +117,7 @@ fun MyApplication(navController: NavHostController, modifier: Modifier = Modifie
 
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
     val authRepository = AuthRepository()
-    val activityViewModel: ActivityViewModel = viewModel(factory = JobViewModelFactory(authRepository, firestoreRepository))
+    val activityViewModel: ActivityViewModel = viewModel(factory = ViewModelFactory(authRepository, firestoreRepository))
 
     Column(
         modifier = modifier
