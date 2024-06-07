@@ -39,16 +39,25 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import org.d3if.infoker.navigation.Screen
+import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.ui.screen.component.UserBottomBar
 import org.d3if.infoker.ui.theme.InfokerTheme
 
 @Composable
 fun Profile2(navController: NavHostController) {
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val authRepository = AuthRepository()
+
+    val currentUser = authRepository.getCurrentUser()
+
+    if (currentUser == null) {
+        navController.navigate(Screen.Login.route)
+    }
 
     BackHandler {
         navController.navigate(Screen.JobList.route)
     }
+
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = Modifier
