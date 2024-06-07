@@ -14,7 +14,7 @@ class JobViewModelFactory(private val authRepository: AuthRepository, private va
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {
             modelClass.isAssignableFrom(AddJobViewModel::class.java) -> {
-                AddJobViewModel(firestoreRepository) as T
+                AddJobViewModel(authRepository, firestoreRepository) as T
             }
             modelClass.isAssignableFrom(JobListViewModel::class.java) -> {
                 JobListViewModel(firestoreRepository) as T

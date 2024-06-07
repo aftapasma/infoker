@@ -11,15 +11,20 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
         title: String,
         location: String,
         salary: Float,
-        description: String
+        description: String,
+        userEmail: String
     ): Boolean {
         return try {
+            val userSnapshot = getUserByEmail(userEmail)
+            val userMap = userSnapshot?.data?.filterKeys { it != "role" } ?: throw Exception("User not found")
+
             val jobMap = hashMapOf(
                 "title" to title,
                 "location" to location,
                 "salary" to salary,
                 "description" to description,
-                "createdAt" to FieldValue.serverTimestamp()
+                "createdAt" to FieldValue.serverTimestamp(),
+                "createdBy" to userMap
             )
             db.collection("jobs").add(jobMap).await()
             Log.d("FirestoreRepository", "Job added to Firestore.")
