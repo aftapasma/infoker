@@ -171,6 +171,25 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
         }
     }
 
+    suspend fun getApplicationStatus(email: String, jobId: String): String? {
+        return try {
+            val applicationQuery = db.collection("applications")
+                .whereEqualTo("user.email", email)
+                .whereEqualTo("job.id", jobId)
+                .get()
+                .await()
+
+            if (applicationQuery.documents.isNotEmpty()) {
+                applicationQuery.documents[0].getString("status")
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Error getting application status", e)
+            null
+        }
+    }
+
     suspend fun deleteBookmark(userEmail: String, jobId: String): Boolean {
         return try {
             // Query to find the bookmark

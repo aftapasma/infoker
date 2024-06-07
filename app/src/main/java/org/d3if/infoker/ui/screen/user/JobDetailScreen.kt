@@ -58,6 +58,7 @@ fun JobDetailScreen(navController: NavHostController, id: String?) {
     val jobDetail by jobDetailViewModel.jobDetail.observeAsState()
     val isApplied by jobDetailViewModel.isApplied.observeAsState(false)
     val isBookmarked by jobDetailViewModel.isBookmarked.observeAsState(false)
+    val applicationStatus by jobDetailViewModel.applicationStatus.observeAsState(null)
     val currentUser = authRepository.getCurrentUser()
 
     Scaffold(
@@ -118,7 +119,8 @@ fun JobDetailScreen(navController: NavHostController, id: String?) {
                                             jobDetailViewModel.toggleApplication(job)
                                         }
                                     }
-                                }
+                                },
+                                enabled = applicationStatus == null || applicationStatus == "Applied"
                             ) {
                                 Text(text = if (!isApplied) "Apply" else "Cancel")
                             }
