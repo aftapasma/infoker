@@ -1,5 +1,6 @@
 package org.d3if.infoker.ui.screen.user
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,12 +38,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import org.d3if.infoker.navigation.Screen
 import org.d3if.infoker.ui.screen.component.UserBottomBar
 import org.d3if.infoker.ui.theme.InfokerTheme
 
 @Composable
 fun Profile2(navController: NavHostController) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
+
+    BackHandler {
+        navController.navigate(Screen.JobList.route)
+    }
 
     Column(
         modifier = Modifier

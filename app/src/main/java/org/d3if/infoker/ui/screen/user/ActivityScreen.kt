@@ -1,6 +1,7 @@
 package org.d3if.infoker.ui.screen.user
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -65,6 +66,10 @@ fun ActivityScreen(navController: NavHostController) {
 
     if (currentUser == null) {
         navController.navigate(Screen.Login.route)
+    }
+
+    BackHandler {
+        navController.navigate(Screen.JobList.route)
     }
 
     Scaffold(
