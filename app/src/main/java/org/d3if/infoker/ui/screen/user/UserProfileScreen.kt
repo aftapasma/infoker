@@ -39,15 +39,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import org.d3if.infoker.ui.screen.component.CompanyBottomBar
+import org.d3if.infoker.navigation.Screen
+import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.ui.screen.component.UserBottomBar
-import org.d3if.infoker.ui.screen.perusahaan.tabs.BeforePersonalCompany
-import org.d3if.infoker.ui.screen.perusahaan.tabs.HeaderCompany
-import org.d3if.infoker.ui.screen.perusahaan.tabs.PersonalCompany
 import org.d3if.infoker.ui.theme.InfokerTheme
 
 @Composable
 fun Profile2(navController: NavHostController) {
+    val authRepository = AuthRepository()
+
+    val currentUser = authRepository.getCurrentUser()
+
+    if (currentUser == null) {
+        navController.navigate(Screen.Login.route)
+    }
+
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
     Scaffold(
