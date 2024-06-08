@@ -6,6 +6,7 @@ import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
 import org.d3if.infoker.ui.screen.user.ActivityViewModel
 import org.d3if.infoker.ui.screen.perusahaan.AddJobViewModel
+import org.d3if.infoker.ui.screen.perusahaan.ApplicantDetailViewModel
 import org.d3if.infoker.ui.screen.perusahaan.ApplicantListViewModel
 import org.d3if.infoker.ui.screen.perusahaan.tabs.HomeViewModel
 import org.d3if.infoker.ui.screen.perusahaan.tabs.ListViewModel
@@ -36,6 +37,9 @@ class ViewModelFactory(private val authRepository: AuthRepository, private val f
             }
             modelClass.isAssignableFrom(ListViewModel::class.java) -> {
                 ListViewModel(firestoreRepository) as T
+            }
+            modelClass.isAssignableFrom(ApplicantDetailViewModel::class.java) -> {
+                ApplicantDetailViewModel(firestoreRepository) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel Class")
         }

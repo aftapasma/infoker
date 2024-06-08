@@ -1,5 +1,7 @@
 package org.d3if.infoker.navigation
 
+import org.d3if.infoker.ui.screen.perusahaan.KEY_APPLICANT_ID
+import org.d3if.infoker.ui.screen.perusahaan.KEY_COMPANYJOB_ID
 import org.d3if.infoker.ui.screen.user.KEY_JOB_ID
 
 sealed class Screen(val route: String) {
@@ -16,7 +18,10 @@ sealed class Screen(val route: String) {
     data object Home: Screen("HomeScreen")
     data object List: Screen("ListScreen")
     data object CompanyProfile: Screen("CompanyProfileScreen")
-    data object ApplicantList: Screen("ApplicantListScreen/{$KEY_JOB_ID}") {
+    data object ApplicantList: Screen("ApplicantListScreen/{$KEY_COMPANYJOB_ID}") {
         fun withId(jobId: String) = "ApplicantListScreen/$jobId"
+    }
+    data object ApplicantDetail: Screen("ApplicantDetailScreen/{$KEY_APPLICANT_ID}") {
+        fun withId(applicantId: String) = "ApplicantDetailScreen/$applicantId"
     }
 }

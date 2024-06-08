@@ -21,7 +21,9 @@ import org.d3if.infoker.ui.screen.LoginScreen
 import org.d3if.infoker.ui.screen.UserRegiterScreen
 import org.d3if.infoker.ui.screen.component.LoadingScreen
 import org.d3if.infoker.ui.screen.perusahaan.AddJobScreen
+import org.d3if.infoker.ui.screen.perusahaan.ApplicantDetailScreen
 import org.d3if.infoker.ui.screen.perusahaan.ApplicantListScreen
+import org.d3if.infoker.ui.screen.perusahaan.KEY_APPLICANT_ID
 import org.d3if.infoker.ui.screen.perusahaan.KEY_COMPANYJOB_ID
 import org.d3if.infoker.ui.screen.perusahaan.tabs.HomeScreen
 import org.d3if.infoker.ui.screen.perusahaan.tabs.ListScreen
@@ -97,11 +99,19 @@ fun SetUpNavGraph(navController: NavHostController = rememberNavController()) {
             }
             composable(route = Screen.ApplicantList.route,
                 arguments = listOf(
-                    navArgument(KEY_JOB_ID) { type = NavType.StringType }
+                    navArgument(KEY_COMPANYJOB_ID) { type = NavType.StringType }
                 )
             ) { navBackStackEntry ->
                 val jobId = navBackStackEntry.arguments?.getString(KEY_COMPANYJOB_ID)
                 ApplicantListScreen(navController = navController, jobId = jobId)
+            }
+            composable(route = Screen.ApplicantDetail.route,
+                arguments = listOf(
+                    navArgument(KEY_APPLICANT_ID) { type = NavType.StringType }
+                )
+            ) { navBackStackEntry ->
+                val applicantId = navBackStackEntry.arguments?.getString(KEY_APPLICANT_ID)
+                ApplicantDetailScreen(navController = navController, applicantId = applicantId)
             }
         }
     }

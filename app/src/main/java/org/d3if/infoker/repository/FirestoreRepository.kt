@@ -368,4 +368,33 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
             emptyList()
         }
     }
+
+    suspend fun getApplicationById(id: String): DocumentSnapshot? {
+        return try {
+            val docRef = db.collection("applications").document(id)
+            val result = docRef.get().await()
+            if (result.exists()) {
+                Log.d("FirestoreRepository", "Application found: ${result.id}")
+                result
+            } else {
+                Log.d("FirestoreRepository", "No application found with ID: $id")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Error getting application by ID", e)
+            null
+        }
+    }
+
+    suspend fun updateApplicationStatus(applicationId: String, status: String): Boolean {
+        return try {
+            val docRef = db.collection("applications").document(applicationId)
+            docRef.update("status", status).await()
+            Log.d("FirestoreRepository", "Application status updated to $status.")
+            true
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Error updating application status", e)
+            false
+        }
+    }
 }
