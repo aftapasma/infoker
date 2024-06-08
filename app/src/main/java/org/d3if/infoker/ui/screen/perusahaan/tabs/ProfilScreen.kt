@@ -52,7 +52,7 @@ fun ProfilScreen(navController: NavHostController) {
         bottomBar = {
             BottomAppBar(
                 content = {
-                    CompanyBottomBar(navController = rememberNavController())
+                    CompanyBottomBar(navController = navController)
                 }
             )
         },
