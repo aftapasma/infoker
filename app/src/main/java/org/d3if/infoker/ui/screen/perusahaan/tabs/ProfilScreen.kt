@@ -3,7 +3,6 @@ package org.d3if.infoker.ui.screen.perusahaan.tabs
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -13,40 +12,42 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import org.d3if.infoker.R
+import com.google.firebase.firestore.FirebaseFirestore
+import org.d3if.infoker.repository.AuthRepository
+import org.d3if.infoker.repository.FirestoreRepository
+import org.d3if.infoker.ui.screen.AuthViewModel
 import org.d3if.infoker.ui.screen.component.CompanyBottomBar
-import org.d3if.infoker.ui.screen.component.UserBottomBar
 import org.d3if.infoker.ui.theme.InfokerTheme
+import org.d3if.infoker.util.AuthViewModelFactory
 
 @Composable
-fun ProfilScreen() {
+fun ProfilScreen(navController: NavHostController) {
+    val authRepository = AuthRepository()
+    val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
+    val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(authRepository, firestoreRepository))
+
     Scaffold(
         bottomBar = {
             BottomAppBar(
@@ -63,7 +64,7 @@ fun ProfilScreen() {
                     .padding(paddingValues),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                HeaderCompany()
+                HeaderCompany(authViewModel, navController)
                 BeforePersonalCompany()
                 PersonalCompany()
             }
@@ -71,9 +72,8 @@ fun ProfilScreen() {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HeaderCompany() {
+fun HeaderCompany(authViewModel: AuthViewModel, navController: NavHostController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -102,13 +102,16 @@ fun HeaderCompany() {
             Text(text = "jawir@email")
         }
         Spacer(modifier = Modifier.width(100.dp))
+        IconButton(onClick = { authViewModel.logout(navController) }) {
             Icon(
-                imageVector = Icons.Default.Logout,
+                imageVector = Icons.AutoMirrored.Filled.Logout,
                 contentDescription = "Profile Picture",
                 modifier = Modifier
                     .size(32.dp)
 
             )
+        }
+
     }
 }
 
@@ -186,6 +189,6 @@ fun BeforePersonalCompany() {
 @Composable
 fun ProfileScreenPreview() {
     InfokerTheme {
-        ProfilScreen()
+        ProfilScreen(rememberNavController())
     }
 }

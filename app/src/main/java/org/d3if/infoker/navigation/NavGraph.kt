@@ -87,7 +87,7 @@ fun SetUpNavGraph(navController: NavHostController = rememberNavController()) {
                 ListScreen(navController)
             }
             composable(route = Screen.CompanyProfile.route) {
-                ProfilScreen()
+                ProfilScreen(navController)
             }
         }
     }
