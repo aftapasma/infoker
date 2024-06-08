@@ -16,10 +16,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -37,31 +39,44 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import org.d3if.infoker.ui.screen.component.CompanyBottomBar
 import org.d3if.infoker.ui.screen.component.UserBottomBar
+import org.d3if.infoker.ui.screen.perusahaan.tabs.BeforePersonalCompany
+import org.d3if.infoker.ui.screen.perusahaan.tabs.HeaderCompany
+import org.d3if.infoker.ui.screen.perusahaan.tabs.PersonalCompany
 import org.d3if.infoker.ui.theme.InfokerTheme
 
 @Composable
 fun Profile2(navController: NavHostController) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxHeight()
-            .fillMaxWidth()
-            .background(color = MaterialTheme.colorScheme.primary)
-        , horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        HeaderSection()
-        Tab(selectedTabIndex) { selectedTabIndex = it }
-        Spacer(modifier = Modifier.height(16.dp))
-        when (selectedTabIndex) {
-            0 -> Personal()
-            1 -> CareerHistory()
+    Scaffold(
+        bottomBar = {
+            BottomAppBar(
+                content = {
+                    UserBottomBar(navController = navController)
+                }
+            )
+        },
+        content = { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(paddingValues)
+                , horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                HeaderSection()
+                Tab(selectedTabIndex) { selectedTabIndex = it }
+                Spacer(modifier = Modifier.height(16.dp))
+                when (selectedTabIndex) {
+                    0 -> Personal()
+                    1 -> CareerHistory()
 //            2 -> Education()
-            // Tambah kalo kurang
+                    // Tambah kalo kurang
+                }
+            }
         }
-        UserBottomBar(navController = navController)
-    }
+    )
 }
 
 @Composable
@@ -70,7 +85,7 @@ fun HeaderSection() {
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                color = MaterialTheme.colorScheme.secondary,
+                color = MaterialTheme.colorScheme.primaryContainer,
 //            shape = RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp)
             )
             .padding(16.dp),
@@ -135,13 +150,11 @@ fun Personal() {
                 text = "Biodata pribadi",
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
-                color = Color.White
             )
             IconButton(onClick = { /* Edit action */ }) {
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = "Edit",
-                    tint = Color.White
                 )
             }
         }

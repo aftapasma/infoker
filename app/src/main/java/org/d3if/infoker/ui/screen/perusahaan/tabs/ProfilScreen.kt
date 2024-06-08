@@ -1,57 +1,77 @@
-package org.d3if.infoker.ui.screen.user
+package org.d3if.infoker.ui.screen.perusahaan.tabs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
+import org.d3if.infoker.R
+import org.d3if.infoker.ui.screen.component.CompanyBottomBar
+import org.d3if.infoker.ui.screen.component.UserBottomBar
 import org.d3if.infoker.ui.theme.InfokerTheme
 
 @Composable
 fun ProfilScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxHeight()
-            .fillMaxWidth()
-        , horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        HeaderCompany()
-        BeforePersonalCompany()
-        PersonalCompany()
-    }
+    Scaffold(
+        bottomBar = {
+            BottomAppBar(
+                content = {
+                    CompanyBottomBar(navController = rememberNavController())
+                }
+            )
+        },
+        content = { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth()
+                    .padding(paddingValues),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                HeaderCompany()
+                BeforePersonalCompany()
+                PersonalCompany()
+            }
+        }
+    )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HeaderCompany() {
     Row(
@@ -62,6 +82,7 @@ fun HeaderCompany() {
 //            shape = RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp)
             )
             .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -72,7 +93,6 @@ fun HeaderCompany() {
                 .background(Color.Gray, shape = CircleShape)
 
         )
-        Spacer(modifier = Modifier.width(16.dp))
         Column {
             Text(
                 text = "Jawir",
@@ -81,6 +101,14 @@ fun HeaderCompany() {
             )
             Text(text = "jawir@email")
         }
+        Spacer(modifier = Modifier.width(100.dp))
+            Icon(
+                imageVector = Icons.Default.Logout,
+                contentDescription = "Profile Picture",
+                modifier = Modifier
+                    .size(32.dp)
+
+            )
     }
 }
 

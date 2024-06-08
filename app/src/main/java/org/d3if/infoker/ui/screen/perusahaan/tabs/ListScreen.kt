@@ -156,7 +156,10 @@ fun ApplicantDetailList(navController: NavHostController?, modifier: Modifier = 
                     onClick = { selectedTabIndex = index },
                     modifier = Modifier.padding(10.dp)
                 ) {
-                    Text(title, style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        title, style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
         }
@@ -255,7 +258,7 @@ fun JobApplicationItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(8.dp)
             .clickable { onClick() }
     ) {
         Row(
@@ -266,7 +269,10 @@ fun JobApplicationItem(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(text = name, style = MaterialTheme.typography.titleLarge)
-                Text(text = jobTitle, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = jobTitle,
+                    style = MaterialTheme.typography.titleMedium,
+                )
                 Text(text = company, style = MaterialTheme.typography.titleMedium)
                 Text(text = location, style = MaterialTheme.typography.titleSmall)
                 Text(text = stringResource(id = R.string.salary_format, salary), style = MaterialTheme.typography.titleSmall)

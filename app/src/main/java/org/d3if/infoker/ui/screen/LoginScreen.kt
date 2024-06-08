@@ -1,21 +1,31 @@
 package org.d3if.infoker.ui.screen
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonDefaults.buttonColors
+import androidx.compose.material3.Card
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,8 +43,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -85,11 +98,45 @@ fun LoginScreen(navController: NavHostController) {
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .background(color = Color.Transparent)
+            .background(color = MaterialTheme.colorScheme.primaryContainer)
     ) {
-        Box(
-            modifier = Modifier.align(Alignment.BottomCenter)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+            ,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.logo_infoker),
+                contentDescription = stringResource(id = R.string.logo_infoker),
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .height(180.dp)
+                    .padding(24.dp)
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+            )
+            Text(
+                text = "Infoker",
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+//                modifier = Modifier
+//                    .padding(130.dp)
+//                    .fillMaxWidth(),
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .background(
+                    color = Color.Transparent,
+                    shape = RoundedCornerShape(25.dp, 25.dp,)
+                )
+                .align(Alignment.BottomCenter)
+        ) {
+
             Column(
                 modifier = Modifier
                     .padding(16.dp)
@@ -97,9 +144,9 @@ fun LoginScreen(navController: NavHostController) {
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(50.dp))
+//                Spacer(modifier = Modifier.height(50.dp))
                 Text(
-                    text = "Sign In",
+                    text = "Masuk",
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .padding(top = 130.dp)
@@ -112,7 +159,7 @@ fun LoginScreen(navController: NavHostController) {
                 Spacer(modifier = Modifier.padding(3.dp))
                 PasswordTextField(password) { password = it }
 
-                val gradientColor = listOf(Color(0xFF484BF1), Color(0xFF673AB7))
+                val gradientColor = listOf(Color(0xFF00696B), Color(0xFF01292B))
                 val cornerRadius = 16.dp
 
                 Spacer(modifier = Modifier.padding(10.dp))
@@ -126,23 +173,46 @@ fun LoginScreen(navController: NavHostController) {
                             .show()
                     }
                 )
-
+                Spacer(modifier = Modifier.padding(5.dp))
+                Text(
+                    text = "Atau",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
                 Spacer(modifier = Modifier.padding(10.dp))
+                SosialMediaLogin()
+                Spacer(modifier = Modifier.padding(10.dp))
+                Text(
+                    text = "Belum Punya Akun ?",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
                 TextButton(onClick = {
                     navController.navigate(Screen.Register.route)
                 }) {
                     Text(
                         text = "Buat Akun",
                         letterSpacing = 1.sp,
-                        style = MaterialTheme.typography.labelLarge
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Color(0xFF00A7FF)
                     )
                 }
 
                 Spacer(modifier = Modifier.padding(5.dp))
+                Text(
+                    text = "Ingin Merekrut Kandidat ?",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
                 TextButton(onClick = {
-                    // Handle reset password navigation if needed
+                    navController.navigate(Screen.Register.route)
                 }) {
-                    // Text("Reset Password", letterSpacing = 1.sp, style = MaterialTheme.typography.labelLarge)
+                    Text(
+                        text = "Masuk Sebagai Perusahaan",
+                        letterSpacing = 1.sp,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Color(0xFF00A7FF)
+                    )
                 }
                 Spacer(modifier = Modifier.padding(20.dp))
             }
@@ -163,7 +233,7 @@ private fun GradientButton(
             .padding(start = 32.dp, end = 32.dp),
         onClick = onClick,
         contentPadding = PaddingValues(),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+        colors = buttonColors(containerColor = Color.Transparent),
         shape = RoundedCornerShape(cornerRadius)
     ) {
         Box(
@@ -177,7 +247,7 @@ private fun GradientButton(
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = "Login", fontSize = 20.sp, color = Color.White)
+            Text(text = "Masuk", fontSize = 20.sp, color = Color.White)
         }
     }
 }
@@ -190,12 +260,12 @@ fun LoginTextField(email: String, onEmailChange: (String) -> Unit) {
         shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
         label = {
             Text(
-                "Email Address",
+                "Alamat Email",
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.labelMedium
             )
         },
-        placeholder = { Text(text = "Email Address") },
+        placeholder = { Text(text = "Alamat Email") },
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Email
@@ -218,7 +288,7 @@ fun PasswordTextField(password: String, onPasswordChange: (String) -> Unit) {
         shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
         label = {
             Text(
-                "Enter Password",
+                "Massukan Password",
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.labelMedium
             )
@@ -236,12 +306,47 @@ fun PasswordTextField(password: String, onPasswordChange: (String) -> Unit) {
             IconButton(onClick = { passwordHidden = !passwordHidden }) {
                 Icon(
                     painter = painterResource(id = if (passwordHidden) R.drawable.baseline_visibility_off_24 else R.drawable.baseline_visibility_24),
-                    contentDescription = if (passwordHidden) "Show password" else "Hide password"
+                    contentDescription = if (passwordHidden) "Lihat password" else "Sembunyikan password"
                 )
             }
         },
         modifier = Modifier.fillMaxWidth(0.8f)
     )
+}
+
+@Composable
+fun SosialMediaLogin() {
+    Card(
+        onClick = {}
+    ) {
+
+    Row(
+        modifier = Modifier
+            .clip(RoundedCornerShape(4.dp))
+            .background(color = Color.White)
+            .padding(8.dp)
+        ,
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.google),
+            contentDescription = null,
+            modifier = Modifier.size(16.dp)
+
+        )
+
+        Spacer(modifier = Modifier.width(5.dp))
+
+        Text(
+            text = "Masuk Menggunakan Google",
+            style = MaterialTheme.typography.labelMedium.copy(
+                color = Color(0xFF64748B)
+            ),
+        )
+
+    }
+    }
 }
 
 @Preview(showBackground = true)

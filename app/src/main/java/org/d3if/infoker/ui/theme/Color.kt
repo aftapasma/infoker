@@ -2,7 +2,7 @@ package org.d3if.infoker.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val primaryLight = Color(0xFF00696B)
-val onPrimaryLight = Color(0xFFFFFFFF)
+val onPrimaryLight = Color(0xFFF1FCFC)
 val primaryContainerLight = Color(0xFF9CF1F3)
 val onPrimaryContainerLight = Color(0xFF002021)
 val secondaryLight = Color(0xFF006970)
