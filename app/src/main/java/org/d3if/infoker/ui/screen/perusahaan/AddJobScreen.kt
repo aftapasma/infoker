@@ -32,7 +32,7 @@ import org.d3if.infoker.R
 import org.d3if.infoker.navigation.Screen
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.ui.theme.InfokerTheme
-import org.d3if.infoker.util.JobViewModelFactory
+import org.d3if.infoker.util.ViewModelFactory
 
 @Composable
 fun AddJobScreen(navController: NavHostController) {
@@ -40,7 +40,7 @@ fun AddJobScreen(navController: NavHostController) {
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
 
     val addJobViewModel: AddJobViewModel =
-        viewModel(factory = JobViewModelFactory(authRepository, firestoreRepository))
+        viewModel(factory = ViewModelFactory(authRepository, firestoreRepository))
 
 
 
@@ -68,6 +68,7 @@ fun AddJobScreen(navController: NavHostController) {
 
     Scaffold { padding ->
         ScreenContent(
+            navController = navController,
             title = title,
             onTitleChange = { title = it },
             location = location,
@@ -86,6 +87,7 @@ fun AddJobScreen(navController: NavHostController) {
 
 @Composable
 fun ScreenContent(
+    navController: NavHostController,
     title: String,
     onTitleChange: (String) -> Unit,
     location: String,
@@ -147,7 +149,10 @@ fun ScreenContent(
             modifier = modifier.fillMaxWidth()
         )
         Button(
-            onClick = { onAddJobClick() },
+            onClick = {
+                onAddJobClick()
+                navController.popBackStack()
+                      },
             modifier = modifier.fillMaxWidth()
         ) {
             Text(text = stringResource(id = R.string.add))

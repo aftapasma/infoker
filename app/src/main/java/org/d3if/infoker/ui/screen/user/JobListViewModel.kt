@@ -19,7 +19,7 @@ class JobListViewModel(private val firestoreRepository: FirestoreRepository) : V
 
     private fun getJobs() {
         viewModelScope.launch {
-            val fetchedJobs = firestoreRepository.getJobs()
+            val fetchedJobs = firestoreRepository.getAllJobs()
             Log.d("JobListViewModel", "Fetched jobs: $fetchedJobs")
             _jobs.value = fetchedJobs
         }

@@ -1,5 +1,7 @@
 package org.d3if.infoker.ui.screen.user
+import android.app.Activity
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,13 +17,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -40,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -58,7 +58,7 @@ import org.d3if.infoker.ui.screen.AuthViewModel
 import org.d3if.infoker.ui.screen.component.UserBottomBar
 import org.d3if.infoker.ui.theme.InfokerTheme
 import org.d3if.infoker.util.AuthViewModelFactory
-import org.d3if.infoker.util.JobViewModelFactory
+import org.d3if.infoker.util.ViewModelFactory
 import java.text.DateFormat
 import java.util.Date
 
@@ -74,11 +74,17 @@ fun JobListScreen(
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
     val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(authRepository, firestoreRepository))
 
-    val jobListViewModel: JobListViewModel = viewModel(factory = JobViewModelFactory(authRepository, firestoreRepository))
+    val jobListViewModel: JobListViewModel = viewModel(factory = ViewModelFactory(authRepository, firestoreRepository))
     val jobs by jobListViewModel.jobs.observeAsState(initial = emptyList())
 
     LaunchedEffect(text) {
         jobListViewModel.searchJobs(text)
+    }
+
+    val activity = LocalContext.current as? Activity
+
+    BackHandler {
+        activity?.finish()
     }
 
     Scaffold(

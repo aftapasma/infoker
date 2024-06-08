@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -39,7 +39,7 @@ import org.d3if.infoker.R
 import org.d3if.infoker.navigation.Screen
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
-import org.d3if.infoker.util.JobViewModelFactory
+import org.d3if.infoker.util.ViewModelFactory
 
 const val KEY_JOB_ID = "jobId"
 
@@ -50,7 +50,7 @@ fun JobDetailScreen(navController: NavHostController, id: String?) {
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
     val authRepository = AuthRepository()
 
-    val jobDetailViewModel: JobDetailViewModel = viewModel(factory = JobViewModelFactory(authRepository, firestoreRepository))
+    val jobDetailViewModel: JobDetailViewModel = viewModel(factory = ViewModelFactory(authRepository, firestoreRepository))
     LaunchedEffect(id) {
         id?.let { jobDetailViewModel.getJobById(it) }
     }
@@ -58,6 +58,7 @@ fun JobDetailScreen(navController: NavHostController, id: String?) {
     val jobDetail by jobDetailViewModel.jobDetail.observeAsState()
     val isApplied by jobDetailViewModel.isApplied.observeAsState(false)
     val isBookmarked by jobDetailViewModel.isBookmarked.observeAsState(false)
+    val applicationStatus by jobDetailViewModel.applicationStatus.observeAsState(null)
     val currentUser = authRepository.getCurrentUser()
 
     Scaffold(
@@ -73,7 +74,7 @@ fun JobDetailScreen(navController: NavHostController, id: String?) {
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
-                            imageVector = Icons.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Localized description"
                         )
                     }
@@ -118,7 +119,8 @@ fun JobDetailScreen(navController: NavHostController, id: String?) {
                                             jobDetailViewModel.toggleApplication(job)
                                         }
                                     }
-                                }
+                                },
+                                enabled = applicationStatus == null || applicationStatus == "Applied"
                             ) {
                                 Text(text = if (!isApplied) "Apply" else "Cancel")
                             }

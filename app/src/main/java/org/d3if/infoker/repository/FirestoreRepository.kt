@@ -11,15 +11,20 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
         title: String,
         location: String,
         salary: Float,
-        description: String
+        description: String,
+        userEmail: String
     ): Boolean {
         return try {
+            val userSnapshot = getUserByEmail(userEmail)
+            val userMap = userSnapshot?.data?.filterKeys { it != "role" } ?: throw Exception("User not found")
+
             val jobMap = hashMapOf(
                 "title" to title,
                 "location" to location,
                 "salary" to salary,
                 "description" to description,
-                "createdAt" to FieldValue.serverTimestamp()
+                "createdAt" to FieldValue.serverTimestamp(),
+                "createdBy" to userMap
             )
             db.collection("jobs").add(jobMap).await()
             Log.d("FirestoreRepository", "Job added to Firestore.")
@@ -31,7 +36,7 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
     }
 
 
-    suspend fun getJobs(): List<DocumentSnapshot> {
+    suspend fun getAllJobs(): List<DocumentSnapshot> {
         return try {
             val docRef = db.collection("jobs")
             val result = docRef.get().await()
@@ -47,6 +52,26 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
             }
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "Error getting jobs", e)
+            emptyList()
+        }
+    }
+
+    suspend fun getJobsByCompany(email: String): List<DocumentSnapshot> {
+        return try {
+            val querySnapshot = db.collection("jobs")
+                .whereEqualTo("createdBy.email", email)
+                .get()
+                .await()
+
+            if (querySnapshot.isEmpty) {
+                Log.d("FirestoreRepository", "No jobs found for user: $email")
+                emptyList()
+            } else {
+                Log.d("FirestoreRepository", "Jobs found: ${querySnapshot.documents.size}")
+                querySnapshot.documents
+            }
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Error getting jobs by user email", e)
             emptyList()
         }
     }
@@ -112,7 +137,8 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
         return try {
             val applicationMap = hashMapOf(
                 "user" to user.data,
-                "job" to jobData
+                "job" to jobData,
+                "status" to "Applied"
             )
             db.collection("applications").add(applicationMap).await()
             Log.d("FirestoreRepository", "Application added to Firestore.")
@@ -167,6 +193,25 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "Error checking applications", e)
             false
+        }
+    }
+
+    suspend fun getApplicationStatus(email: String, jobId: String): String? {
+        return try {
+            val applicationQuery = db.collection("applications")
+                .whereEqualTo("user.email", email)
+                .whereEqualTo("job.id", jobId)
+                .get()
+                .await()
+
+            if (applicationQuery.documents.isNotEmpty()) {
+                applicationQuery.documents[0].getString("status")
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Error getting application status", e)
+            null
         }
     }
 

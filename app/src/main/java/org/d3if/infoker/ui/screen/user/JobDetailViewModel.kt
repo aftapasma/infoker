@@ -19,17 +19,23 @@ class JobDetailViewModel(private val authRepository: AuthRepository, private val
     private val _isApplied = MutableLiveData<Boolean>()
     val isApplied: LiveData<Boolean> get() = _isApplied
 
+    private val _applicationStatus = MutableLiveData<String?>()
+    val applicationStatus: LiveData<String?> get() = _applicationStatus
+
     fun getJobById(id: String) {
         viewModelScope.launch {
             val job = firestoreRepository.getJobById(id)
             _jobDetail.value = job
 
-            // Fetch bookmark status
             authRepository.getCurrentUser()?.email?.let { email ->
                 val isBookmarked = firestoreRepository.isJobBookmarkedByUser(email, id)
                 _isBookmarked.value = isBookmarked
+
                 val isApplied = firestoreRepository.isJobAppliedByUser(email, id)
                 _isApplied.value = isApplied
+
+                val applicationStatus = firestoreRepository.getApplicationStatus(email, id)
+                _applicationStatus.value = applicationStatus
             }
         }
     }

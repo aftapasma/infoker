@@ -1,5 +1,6 @@
 package org.d3if.infoker.ui.screen.perusahaan.tabs
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -92,6 +93,10 @@ val dummyRejectedApplicants = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListScreen(navController: NavHostController) {
+    BackHandler {
+        navController.navigate(Screen.Home.route)
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -118,9 +123,9 @@ fun ListScreen(navController: NavHostController) {
                 )
             }
         },
-        bottomBar = {
-            CompanyBottomBar(navController = navController)
-        }
+//        bottomBar = {
+//            CompanyBottomBar(navController = navController)
+//        }
     )
 }
 
