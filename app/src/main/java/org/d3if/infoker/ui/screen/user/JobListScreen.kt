@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -124,7 +125,7 @@ fun JobListScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 SearchBar(
-                    modifier = Modifier.padding(top = 8.dp),
+                    modifier = Modifier.padding(8.dp),
                     query = text,
                     onQueryChange = { newText ->
                         text = newText
@@ -134,8 +135,7 @@ fun JobListScreen(
                     active = active,
                     onActiveChange = { active = it },
                     placeholder = { Text("Search jobs") },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
-                    trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = "More") },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") }
                 ) {
 
                 }
@@ -173,7 +173,7 @@ fun JobListItem(job: DocumentSnapshot, onClick: () -> Unit) {
     val formattedDate = DateFormat.getDateInstance().format(date)
 
 
-    Box(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
