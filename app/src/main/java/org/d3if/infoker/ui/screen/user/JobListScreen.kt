@@ -1,4 +1,5 @@
 package org.d3if.infoker.ui.screen.user
+import AuthViewModel
 import android.app.Activity
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
@@ -50,7 +51,6 @@ import org.d3if.infoker.R
 import org.d3if.infoker.navigation.Screen
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
-import org.d3if.infoker.ui.screen.AuthViewModel
 import org.d3if.infoker.ui.screen.component.UserBottomBar
 import org.d3if.infoker.ui.theme.InfokerTheme
 import org.d3if.infoker.util.AuthViewModelFactory

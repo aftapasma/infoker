@@ -1,6 +1,5 @@
-package org.d3if.infoker.ui.screen
-
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,7 +13,10 @@ import org.d3if.infoker.repository.FirestoreRepository
 
 class AuthViewModel(private val authRepository: AuthRepository, private val firestoreRepository: FirestoreRepository) : ViewModel() {
     private val _authResult = MutableLiveData<AuthResult<FirebaseUser>>()
-//    val authResult: MutableLiveData<AuthResult<FirebaseUser>> get() = _authResult
+    val authResult: LiveData<AuthResult<FirebaseUser>> get() = _authResult
+
+    private val _userProfile = MutableLiveData<UserProfile?>()
+    val userProfile: LiveData<UserProfile?> get() = _userProfile
 
     init {
         checkCurrentUser()
@@ -66,12 +68,21 @@ class AuthViewModel(private val authRepository: AuthRepository, private val fire
     private fun checkCurrentUser() {
         val user = authRepository.getCurrentUser()
         _authResult.value = AuthResult.Success(user)
+        user?.let { fetchUserProfile(it.email!!) }
+    }
+
+    private fun fetchUserProfile(email: String) {
+        viewModelScope.launch {
+            val userDocument = firestoreRepository.getUserByEmail(email)
+            _userProfile.value = userDocument?.toObject(UserProfile::class.java)
+        }
     }
 
     private fun updateUI(user: FirebaseUser?, navController: NavHostController) {
         if (user != null) {
             val email = user.email
             if (email != null) {
+                fetchUserProfile(email)
                 viewModelScope.launch {
                     val role = firestoreRepository.getUserRoleByEmail(email)
                     role?.let {
@@ -104,3 +115,8 @@ class AuthViewModel(private val authRepository: AuthRepository, private val fire
         }
     }
 }
+
+data class UserProfile(
+    val email: String = "",
+    val name: String = ""
+)

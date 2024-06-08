@@ -1,6 +1,7 @@
 package org.d3if.infoker.ui.screen
 
 
+import AuthViewModel
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

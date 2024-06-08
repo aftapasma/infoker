@@ -1,5 +1,6 @@
 package org.d3if.infoker.ui.screen.user
 
+import AuthViewModel
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +30,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,7 +48,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import org.d3if.infoker.navigation.Screen
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
-import org.d3if.infoker.ui.screen.AuthViewModel
 import org.d3if.infoker.ui.screen.component.UserBottomBar
 import org.d3if.infoker.ui.theme.InfokerTheme
 import org.d3if.infoker.util.AuthViewModelFactory
@@ -81,8 +82,8 @@ fun Profile2(navController: NavHostController) {
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .padding(paddingValues)
-                , horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(paddingValues),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 HeaderSection(authViewModel, navController)
                 Tab(selectedTabIndex) { selectedTabIndex = it }
@@ -90,24 +91,20 @@ fun Profile2(navController: NavHostController) {
                 when (selectedTabIndex) {
                     0 -> Personal()
                     1 -> CareerHistory()
-//            2 -> Education()
-                    // Tambah kalo kurang
                 }
             }
         }
-
     )
 }
 
 @Composable
 fun HeaderSection(authViewModel: AuthViewModel, navController: NavHostController) {
+    val userProfile by authViewModel.userProfile.observeAsState()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colorScheme.primaryContainer,
-//            shape = RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp)
-            )
+            .background(color = MaterialTheme.colorScheme.primaryContainer)
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -118,23 +115,21 @@ fun HeaderSection(authViewModel: AuthViewModel, navController: NavHostController
             modifier = Modifier
                 .size(64.dp)
                 .background(Color.Gray, shape = CircleShape)
-
         )
         Column {
             Text(
-                text = "Jawir",
+                text = userProfile?.name ?: "Loading...",
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
             )
-            Text(text = "jawir@email")
+            Text(text = userProfile?.email ?: "Loading...")
         }
         Spacer(modifier = Modifier.width(100.dp))
         IconButton(onClick = { authViewModel.logout(navController) }) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Logout,
-                contentDescription = "Profile Picture",
-                modifier = Modifier
-                    .size(32.dp)
+                contentDescription = "Logout",
+                modifier = Modifier.size(32.dp)
             )
         }
     }
@@ -146,7 +141,6 @@ fun Tab(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
 
     TabRow(
         selectedTabIndex = selectedTabIndex,
-//        backgroundColor = Color(0xFF121212),
         containerColor = Color.DarkGray,
         contentColor = Color.White,
     ) {
@@ -190,16 +184,14 @@ fun Personal() {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-//            backgroundColor = Color(0xFF1E1E1E)
+                .padding(8.dp)
         ) {
             Text(
                 text = "P",
                 color = Color.Gray,
-                modifier = Modifier.padding( 16.dp)
+                modifier = Modifier.padding(16.dp)
             )
         }
-
     }
 }
 
@@ -230,19 +222,15 @@ fun CareerHistory() {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-//            backgroundColor = Color(0xFF1E1E1E)
+                .padding(8.dp)
         ) {
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column(
-                    modifier = Modifier.padding(8.dp)
-                ) {
+                Column(modifier = Modifier.padding(8.dp)) {
                     Text(text = "Nama Pekerjaan", color = Color.White, style = MaterialTheme.typography.titleLarge)
                     Text(text = "nama perusahaan", color = Color.Gray, style = MaterialTheme.typography.titleMedium)
                     Text(
@@ -259,7 +247,6 @@ fun CareerHistory() {
                     )
                 }
             }
-
         }
     }
 }

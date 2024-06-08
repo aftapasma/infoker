@@ -1,5 +1,6 @@
 package org.d3if.infoker.ui.screen
 
+import AuthViewModel
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -69,8 +70,7 @@ import org.d3if.infoker.util.AuthViewModelFactory
 fun LoginScreen(navController: NavHostController) {
     val authRepository = AuthRepository()
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
-    val authViewModel: AuthViewModel =
-        viewModel(factory = AuthViewModelFactory(authRepository, firestoreRepository))
+    val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(authRepository, firestoreRepository))
     val context = LocalContext.current
 
     var email by rememberSaveable { mutableStateOf("") }
