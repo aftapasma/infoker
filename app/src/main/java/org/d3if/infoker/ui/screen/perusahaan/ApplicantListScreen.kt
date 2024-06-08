@@ -1,5 +1,6 @@
 package org.d3if.infoker.ui.screen.perusahaan
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -19,6 +20,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,41 +31,49 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
 import org.d3if.infoker.R
+import org.d3if.infoker.repository.AuthRepository
+import org.d3if.infoker.repository.FirestoreRepository
+import org.d3if.infoker.ui.screen.perusahaan.tabs.HomeViewModel
 import org.d3if.infoker.ui.theme.InfokerTheme
+import org.d3if.infoker.util.ViewModelFactory
 import java.text.DateFormat
 import java.util.Date
 
-data class Applicant(
-    val name: String,
-    val jobTitle: String,
-    val company: String,
-    val location: String,
-    val salary: Double,
-    val createdAt: Date
-)
+const val KEY_COMPANYJOB_ID = "jobId"
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ApplicantListScreen(navController: NavHostController) {
-    val dummyApplicants = listOf(
-        Applicant("John Doe", "Software Engineer", "Tech Corp", "San Francisco, CA", 120000.0, Date()),
-        Applicant("Jane Smith", "Product Manager", "Innovate Ltd.", "New York, NY", 95000.0, Date()),
-        Applicant("Robert Johnson", "UX Designer", "Creative Inc.", "Los Angeles, CA", 80000.0, Date())
-    )
+fun ApplicantListScreen(navController: NavHostController, jobId: String?) {
+    val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
+    val authRepository = AuthRepository()
+    val applicantListViewModel: ApplicantListViewModel = viewModel(factory = ViewModelFactory(authRepository, firestoreRepository))
+
+    LaunchedEffect(jobId) {
+        if (jobId != null) {
+            applicantListViewModel.getApplicationsByJobId(jobId)
+        }
+    }
+
+    val applicants by applicantListViewModel.applicants.collectAsState()
+
     Scaffold(
         content = {
-            ApplicantList(applicants = dummyApplicants, onClick = {})
+            ApplicantList(applicants = applicants, onClick = {})
         }
     )
 }
 
 @Composable
 fun ApplicantList(
-    applicants: List<Applicant>,
+    applicants: List<DocumentSnapshot>,
     modifier: Modifier = Modifier,
-    onClick: (Applicant) -> Unit
+    onClick: (DocumentSnapshot) -> Unit
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize()
@@ -72,8 +85,13 @@ fun ApplicantList(
 }
 
 @Composable
-fun ApplicantListItem(applicant: Applicant, onClick: () -> Unit) {
-    val formattedDate = DateFormat.getDateInstance().format(applicant.createdAt)
+fun ApplicantListItem(applicant: DocumentSnapshot, onClick: () -> Unit) {
+    val userMap = applicant["user"] as? Map<String, Any> ?: emptyMap()
+    val name = userMap["name"] as? String ?: "Unknown"
+    val email = userMap["email"] as? String ?: "Unknown"
+    val createdAt = (applicant["createdAt"] as? com.google.firebase.Timestamp)?.toDate() ?: Date()
+
+    val formattedDate = DateFormat.getDateInstance().format(createdAt)
 
     Box(
         modifier = Modifier
@@ -102,11 +120,8 @@ fun ApplicantListItem(applicant: Applicant, onClick: () -> Unit) {
                     .padding(8.dp),
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(text = applicant.name, style = MaterialTheme.typography.titleLarge)
-                Text(text = applicant.jobTitle, style = MaterialTheme.typography.titleMedium)
-                Text(text = applicant.company, style = MaterialTheme.typography.titleMedium)
-                Text(text = applicant.location, style = MaterialTheme.typography.titleSmall)
-                Text(text = stringResource(id = R.string.salary_format, applicant.salary), style = MaterialTheme.typography.titleSmall)
+                Text(text = name, style = MaterialTheme.typography.titleLarge)
+                Text(text = email, style = MaterialTheme.typography.titleMedium)
                 Text(text = formattedDate, style = MaterialTheme.typography.titleSmall)
             }
         }
@@ -118,6 +133,6 @@ fun ApplicantListItem(applicant: Applicant, onClick: () -> Unit) {
 @Composable
 fun PreviewApplicantList() {
     InfokerTheme {
-        ApplicantListScreen(rememberNavController())
+        ApplicantListScreen(rememberNavController(), jobId = "dummyJobId")
     }
 }

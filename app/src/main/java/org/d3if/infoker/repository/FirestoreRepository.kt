@@ -139,7 +139,8 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
             val applicationMap = hashMapOf(
                 "user" to user.data,
                 "job" to jobData,
-                "status" to "Applied"
+                "status" to "Applied",
+                "createdAt" to FieldValue.serverTimestamp(),
             )
             db.collection("applications").add(applicationMap).await()
             Log.d("FirestoreRepository", "Application added to Firestore.")
@@ -344,6 +345,26 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
             }
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "Error getting rejected applications", e)
+            emptyList()
+        }
+    }
+
+    suspend fun getApplicationsByJobId(jobId: String): List<DocumentSnapshot> {
+        return try {
+            val querySnapshot = db.collection("applications")
+                .whereEqualTo("job.id", jobId)
+                .get()
+                .await()
+
+            if (querySnapshot.isEmpty) {
+                Log.d("FirestoreRepository", "No applications found for job ID: $jobId")
+                emptyList()
+            } else {
+                Log.d("FirestoreRepository", "Applications found: ${querySnapshot.documents.size}")
+                querySnapshot.documents
+            }
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Error getting applications by job ID", e)
             emptyList()
         }
     }

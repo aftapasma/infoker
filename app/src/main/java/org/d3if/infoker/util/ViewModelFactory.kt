@@ -4,10 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
+import org.d3if.infoker.ui.screen.user.ActivityViewModel
 import org.d3if.infoker.ui.screen.perusahaan.AddJobViewModel
+import org.d3if.infoker.ui.screen.perusahaan.ApplicantListViewModel
 import org.d3if.infoker.ui.screen.perusahaan.tabs.HomeViewModel
 import org.d3if.infoker.ui.screen.perusahaan.tabs.ListViewModel
-import org.d3if.infoker.ui.screen.user.ActivityViewModel
 import org.d3if.infoker.ui.screen.user.JobDetailViewModel
 import org.d3if.infoker.ui.screen.user.JobListViewModel
 
@@ -29,6 +30,9 @@ class ViewModelFactory(private val authRepository: AuthRepository, private val f
             }
             modelClass.isAssignableFrom(HomeViewModel::class.java) -> {
                 HomeViewModel(authRepository, firestoreRepository) as T
+            }
+            modelClass.isAssignableFrom(ApplicantListViewModel::class.java) -> {
+                ApplicantListViewModel(firestoreRepository) as T
             }
             modelClass.isAssignableFrom(ListViewModel::class.java) -> {
                 ListViewModel(firestoreRepository) as T

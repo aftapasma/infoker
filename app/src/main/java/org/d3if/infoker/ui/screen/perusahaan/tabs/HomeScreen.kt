@@ -128,7 +128,7 @@ fun ListItem(job: DocumentSnapshot, navController: NavHostController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { /* Handle job click */ }
+            .clickable { navController.navigate(Screen.ApplicantList.withId(job.id)) }
             .padding(8.dp)
             .border(1.dp, Color.Black, RoundedCornerShape(16.dp))
     ) {
