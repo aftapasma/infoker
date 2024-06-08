@@ -1,10 +1,10 @@
 package org.d3if.infoker.util
 
+import AuthViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
-import org.d3if.infoker.ui.screen.AuthViewModel
 
 class AuthViewModelFactory(private val authRepository: AuthRepository, private val firestoreRepository: FirestoreRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

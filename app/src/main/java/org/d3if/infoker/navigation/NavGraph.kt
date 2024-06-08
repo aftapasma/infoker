@@ -1,5 +1,6 @@
 package org.d3if.infoker.navigation
 
+import ProfilScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,7 +27,6 @@ import org.d3if.infoker.ui.screen.user.ActivityScreen
 import org.d3if.infoker.ui.screen.user.JobDetailScreen
 import org.d3if.infoker.ui.screen.user.JobListScreen
 import org.d3if.infoker.ui.screen.user.KEY_JOB_ID
-import org.d3if.infoker.ui.screen.perusahaan.tabs.ProfilScreen
 import org.d3if.infoker.ui.screen.user.Profile2
 
 @Composable
