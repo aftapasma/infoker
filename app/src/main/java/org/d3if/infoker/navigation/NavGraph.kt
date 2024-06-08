@@ -21,6 +21,8 @@ import org.d3if.infoker.ui.screen.LoginScreen
 import org.d3if.infoker.ui.screen.UserRegiterScreen
 import org.d3if.infoker.ui.screen.component.LoadingScreen
 import org.d3if.infoker.ui.screen.perusahaan.AddJobScreen
+import org.d3if.infoker.ui.screen.perusahaan.ApplicantListScreen
+import org.d3if.infoker.ui.screen.perusahaan.KEY_COMPANYJOB_ID
 import org.d3if.infoker.ui.screen.perusahaan.tabs.HomeScreen
 import org.d3if.infoker.ui.screen.perusahaan.tabs.ListScreen
 import org.d3if.infoker.ui.screen.user.ActivityScreen
@@ -92,6 +94,14 @@ fun SetUpNavGraph(navController: NavHostController = rememberNavController()) {
             }
             composable(route = Screen.CompanyProfile.route) {
                 ProfilScreen(navController)
+            }
+            composable(route = Screen.ApplicantList.route,
+                arguments = listOf(
+                    navArgument(KEY_JOB_ID) { type = NavType.StringType }
+                )
+            ) { navBackStackEntry ->
+                val jobId = navBackStackEntry.arguments?.getString(KEY_COMPANYJOB_ID)
+                ApplicantListScreen(navController = navController, jobId = jobId)
             }
         }
     }
