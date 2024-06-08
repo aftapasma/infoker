@@ -39,16 +39,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.firestore.FirebaseFirestore
 import org.d3if.infoker.navigation.Screen
 import org.d3if.infoker.repository.AuthRepository
+import org.d3if.infoker.repository.FirestoreRepository
+import org.d3if.infoker.ui.screen.AuthViewModel
 import org.d3if.infoker.ui.screen.component.UserBottomBar
 import org.d3if.infoker.ui.theme.InfokerTheme
+import org.d3if.infoker.util.AuthViewModelFactory
 
 @Composable
 fun Profile2(navController: NavHostController) {
     val authRepository = AuthRepository()
+    val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
+    val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(authRepository, firestoreRepository))
 
     val currentUser = authRepository.getCurrentUser()
 
@@ -77,7 +84,7 @@ fun Profile2(navController: NavHostController) {
                     .padding(paddingValues)
                 , horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                HeaderSection()
+                HeaderSection(authViewModel, navController)
                 Tab(selectedTabIndex) { selectedTabIndex = it }
                 Spacer(modifier = Modifier.height(16.dp))
                 when (selectedTabIndex) {
@@ -93,7 +100,7 @@ fun Profile2(navController: NavHostController) {
 }
 
 @Composable
-fun HeaderSection() {
+fun HeaderSection(authViewModel: AuthViewModel, navController: NavHostController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -122,7 +129,7 @@ fun HeaderSection() {
             Text(text = "jawir@email")
         }
         Spacer(modifier = Modifier.width(100.dp))
-        IconButton(onClick = {  }) {
+        IconButton(onClick = { authViewModel.logout(navController) }) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Logout,
                 contentDescription = "Profile Picture",
