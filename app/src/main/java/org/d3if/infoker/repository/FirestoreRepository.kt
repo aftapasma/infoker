@@ -305,4 +305,46 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
             emptyList()
         }
     }
+
+    suspend fun getAcceptedApplicationsByCompany(email: String): List<DocumentSnapshot> {
+        return try {
+            val querySnapshot = db.collection("applications")
+                .whereEqualTo("job.createdBy.email", email)
+                .whereEqualTo("status", "Accepted")
+                .get()
+                .await()
+
+            if (querySnapshot.isEmpty) {
+                Log.d("FirestoreRepository", "No accepted applications found for user: $email")
+                emptyList()
+            } else {
+                Log.d("FirestoreRepository", "Accepted applications found: ${querySnapshot.documents.size}")
+                querySnapshot.documents
+            }
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Error getting accepted applications", e)
+            emptyList()
+        }
+    }
+
+    suspend fun getRejectedApplicationsByCompany(email: String): List<DocumentSnapshot> {
+        return try {
+            val querySnapshot = db.collection("applications")
+                .whereEqualTo("job.createdBy.email", email)
+                .whereEqualTo("status", "Rejected")
+                .get()
+                .await()
+
+            if (querySnapshot.isEmpty) {
+                Log.d("FirestoreRepository", "No rejected applications found for user: $email")
+                emptyList()
+            } else {
+                Log.d("FirestoreRepository", "Rejected applications found: ${querySnapshot.documents.size}")
+                querySnapshot.documents
+            }
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Error getting rejected applications", e)
+            emptyList()
+        }
+    }
 }
