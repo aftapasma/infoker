@@ -2,6 +2,7 @@ package org.d3if.infoker.ui.screen.perusahaan.tabs
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -263,8 +264,9 @@ fun JobApplicationItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
-            .clickable { onClick() }
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .border(1.dp, Color.Black, RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
