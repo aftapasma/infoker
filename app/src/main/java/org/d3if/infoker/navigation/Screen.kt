@@ -3,7 +3,8 @@ package org.d3if.infoker.navigation
 import org.d3if.infoker.ui.screen.user.KEY_JOB_ID
 
 sealed class Screen(val route: String) {
-    data object Register: Screen("registerScreen")
+    data object UserRegister: Screen("userRegisterScreen")
+    data object CompanyRegister: Screen("companyRegisterScreen")
     data object Login: Screen("loginScreen")
     data object JobList: Screen("jobListScreen")
     data object JobDetail: Screen("jobDetailScreen/{$KEY_JOB_ID}") {

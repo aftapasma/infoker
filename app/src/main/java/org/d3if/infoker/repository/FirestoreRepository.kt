@@ -76,11 +76,12 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
         }
     }
 
-    suspend fun addUser(name: String, email: String): Boolean {
+    suspend fun addUser(name: String, email: String, role: String): Boolean {
         return try {
             val userMap = hashMapOf(
                 "name" to name,
-                "email" to email.trim().lowercase()
+                "email" to email.trim().lowercase(),
+                "role" to role
             )
             db.collection("users").add(userMap).await()
             Log.d("FirestoreRepository", "User added to Firestore.")

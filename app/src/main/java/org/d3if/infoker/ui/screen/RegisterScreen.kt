@@ -62,7 +62,7 @@ import org.d3if.infoker.ui.theme.InfokerTheme
 import org.d3if.infoker.util.AuthViewModelFactory
 
 @Composable
-fun RegisterScreen(navController: NavHostController) {
+fun UserRegiterScreen(navController: NavHostController) {
     val authRepository = AuthRepository()
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
     val authViewModel: AuthViewModel =
@@ -160,7 +160,7 @@ fun RegisterScreen(navController: NavHostController) {
                     color = MaterialTheme.colorScheme.primary,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                RegisterName(name) { name = it }
+                UserRegisterName(name) { name = it }
 
                 Spacer(modifier = Modifier.padding(3.dp))
                 RegisterEmail(email) { email = it }
@@ -200,6 +200,7 @@ fun RegisterScreen(navController: NavHostController) {
                             email,
                             password,
                             name,
+                                "user",
                             navController
                         )
                         else return@GradientButton
@@ -251,6 +252,196 @@ fun RegisterScreen(navController: NavHostController) {
 
 }
 
+@Composable
+fun CompanyRegiterScreen(navController: NavHostController) {
+    val authRepository = AuthRepository()
+    val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
+    val authViewModel: AuthViewModel =
+        viewModel(factory = AuthViewModelFactory(authRepository, firestoreRepository))
+
+    var name by rememberSaveable { mutableStateOf("") }
+    var email by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var passwordConfirm by rememberSaveable { mutableStateOf("") }
+
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+
+    DisposableEffect(Unit) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                email = ""
+                password = ""
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    BackHandler {
+        navController.navigate(Screen.JobList.route)
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .background(
+                color = MaterialTheme.colorScheme.primaryContainer,
+            )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+            ,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.logo_infoker),
+                contentDescription = stringResource(id = R.string.logo_infoker),
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .height(180.dp)
+                    .padding(24.dp)
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+            )
+            Text(
+                text = "Infoker",
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+//                modifier = Modifier
+//                    .padding(130.dp)
+//                    .fillMaxWidth(),
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+        Box(
+            modifier = Modifier
+                /*.background(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    shape = RoundedCornerShape(25.dp, 5.dp, 25.dp, 5.dp)
+                )*/
+                .align(Alignment.BottomCenter),
+        ) {
+
+
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                //.........................Spacer
+                Spacer(modifier = Modifier.height(30.dp))
+
+                //.........................Text: title
+                Text(
+                    text = "Buat Akun",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(top = 130.dp)
+                        .fillMaxWidth(),
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                CompanyRegisterName(name) { name = it }
+
+                Spacer(modifier = Modifier.padding(3.dp))
+                RegisterEmail(email) { email = it }
+
+                Spacer(modifier = Modifier.padding(3.dp))
+                RegisterPassword(password) { password = it }
+
+                Spacer(modifier = Modifier.padding(3.dp))
+                RegisterPasswordConfirm(passwordConfirm) { passwordConfirm = it }
+
+
+                val gradientColor = listOf(Color(0xFF00696B), Color(0xFF01292B))
+                val cornerRadius = 16.dp
+
+
+                Spacer(modifier = Modifier.padding(10.dp))
+                /* Button(
+                     onClick = {},
+                     modifier = Modifier
+                         .fillMaxWidth(0.8f)
+                         .height(50.dp)
+                 ) {
+                     Text(text = "Login", fontSize = 20.sp)
+                 }*/
+                GradientButton(
+                    gradientColors = gradientColor,
+                    cornerRadius = cornerRadius,
+                    nameButton = "Buat Akun",
+                    roundedCornerShape = RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp),
+                    onClick = {
+                        if (inputCheck(name, email, password, password) && passwordCheck(
+                                password,
+                                passwordConfirm
+                            )
+                        )
+                            authViewModel.register(
+                                email,
+                                password,
+                                name,
+                                "company",
+                                navController
+                            )
+                        else return@GradientButton
+                    }
+                )
+                Spacer(modifier = Modifier.padding(10.dp))
+                Text(
+                    text = "Sudah punya akun?",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                androidx.compose.material3.TextButton(onClick = {
+                    navController.popBackStack()
+                }) {
+                    Text(
+                        text = "Sign In",
+                        letterSpacing = 1.sp,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Color(0xFF00A7FF)
+                    )
+                }
+
+
+                Spacer(modifier = Modifier.padding(5.dp))
+                androidx.compose.material3.TextButton(onClick = {
+
+//                    navController.navigate("reset_page"){
+//                        popUpTo(navController.graph.startDestinationId)
+//                        launchSingleTop = true
+//                    }
+
+
+                }) {
+//                    androidx.compose.material3.Text(
+//                        text = "Reset Password",
+//                        letterSpacing = 1.sp,
+//                        style = MaterialTheme.typography.labelLarge,
+//                    )
+                }
+                Spacer(modifier = Modifier.padding(20.dp))
+
+            }
+
+
+        }
+
+    }
+
+
+}
 
 //...........................................................................
 @Composable
@@ -303,7 +494,7 @@ private fun GradientButton(
 //name
 
 @Composable
-fun RegisterName(
+fun UserRegisterName(
     name: String,
     onNameChange: (String) -> Unit
 ) {
@@ -333,6 +524,36 @@ fun RegisterName(
     )
 }
 
+@Composable
+fun CompanyRegisterName(
+    name: String,
+    onNameChange: (String) -> Unit
+) {
+    OutlinedTextField(
+        value = name,
+        onValueChange = onNameChange,
+        shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
+        label = {
+            Text(
+                "Nama Perusahaan",
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.labelMedium
+            )
+        },
+        placeholder = { Text(text = "Nama Perusahaan") },
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+            capitalization = KeyboardCapitalization.Words
+        ),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+        ),
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth(0.8f)
+    )
+}
 
 //email id
 @Composable
@@ -445,6 +666,6 @@ private fun passwordCheck(password: String, passwordConfirm: String): Boolean {
 @Composable
 fun RegisterPreview() {
     InfokerTheme {
-        RegisterScreen(rememberNavController())
+        UserRegiterScreen(rememberNavController())
     }
 }

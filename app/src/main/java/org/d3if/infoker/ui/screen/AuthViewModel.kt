@@ -14,7 +14,7 @@ import org.d3if.infoker.repository.FirestoreRepository
 
 class AuthViewModel(private val authRepository: AuthRepository, private val firestoreRepository: FirestoreRepository) : ViewModel() {
     private val _authResult = MutableLiveData<AuthResult<FirebaseUser>>()
-    val authResult: MutableLiveData<AuthResult<FirebaseUser>> get() = _authResult
+//    val authResult: MutableLiveData<AuthResult<FirebaseUser>> get() = _authResult
 
     init {
         checkCurrentUser()
@@ -34,13 +34,13 @@ class AuthViewModel(private val authRepository: AuthRepository, private val fire
         }
     }
 
-    fun register(email: String, password: String, name: String, navController: NavHostController) {
+    fun register(email: String, password: String, name: String, role: String, navController: NavHostController) {
         authRepository.registerWithEmail(email, password).observeForever { result ->
             _authResult.value = result
 
             if (result is AuthResult.Success) {
                 viewModelScope.launch {
-                    val userAdded = firestoreRepository.addUser(name, email)
+                    val userAdded = firestoreRepository.addUser(name, email, role)
                     if (userAdded) {
                         updateUI(result.data, navController)
                         Log.d("AuthViewModel", "User added to Firestore")

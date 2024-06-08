@@ -189,7 +189,7 @@ fun LoginScreen(navController: NavHostController) {
                     color = MaterialTheme.colorScheme.primary
                 )
                 TextButton(onClick = {
-                    navController.navigate(Screen.Register.route)
+                    navController.navigate(Screen.UserRegister.route)
                 }) {
                     Text(
                         text = "Buat Akun",
@@ -206,10 +206,10 @@ fun LoginScreen(navController: NavHostController) {
                     color = MaterialTheme.colorScheme.primary
                 )
                 TextButton(onClick = {
-                    navController.navigate(Screen.Register.route)
+                    navController.navigate(Screen.CompanyRegister.route)
                 }) {
                     Text(
-                        text = "Masuk Sebagai Perusahaan",
+                        text = "Daftar Sebagai Perusahaan",
                         letterSpacing = 1.sp,
                         style = MaterialTheme.typography.labelLarge,
                         color = Color(0xFF00A7FF)

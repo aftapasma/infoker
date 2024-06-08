@@ -15,8 +15,9 @@ import androidx.navigation.navArgument
 import com.google.firebase.firestore.FirebaseFirestore
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
+import org.d3if.infoker.ui.screen.CompanyRegiterScreen
 import org.d3if.infoker.ui.screen.LoginScreen
-import org.d3if.infoker.ui.screen.RegisterScreen
+import org.d3if.infoker.ui.screen.UserRegiterScreen
 import org.d3if.infoker.ui.screen.component.LoadingScreen
 import org.d3if.infoker.ui.screen.perusahaan.AddJobScreen
 import org.d3if.infoker.ui.screen.perusahaan.tabs.HomeScreen
@@ -54,8 +55,11 @@ fun SetUpNavGraph(navController: NavHostController = rememberNavController()) {
             navController = navController,
             startDestination = startDestination!!
         ) {
-            composable(route = Screen.Register.route) {
-                RegisterScreen(navController)
+            composable(route = Screen.UserRegister.route) {
+                UserRegiterScreen(navController)
+            }
+            composable(route = Screen.CompanyRegister.route) {
+                CompanyRegiterScreen(navController)
             }
             composable(route = Screen.Login.route) {
                 LoginScreen(navController)
