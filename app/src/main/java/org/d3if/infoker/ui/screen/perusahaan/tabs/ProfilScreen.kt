@@ -108,10 +108,8 @@ fun HeaderCompany(authViewModel: AuthViewModel, navController: NavHostController
                 contentDescription = "Profile Picture",
                 modifier = Modifier
                     .size(32.dp)
-
             )
         }
-
     }
 }
 

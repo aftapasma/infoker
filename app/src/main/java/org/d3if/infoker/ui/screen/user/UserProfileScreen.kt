@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.Edit
@@ -87,6 +88,7 @@ fun Profile2(navController: NavHostController) {
                 }
             }
         }
+
     )
 }
 
@@ -100,6 +102,7 @@ fun HeaderSection() {
 //            shape = RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp)
             )
             .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -110,7 +113,6 @@ fun HeaderSection() {
                 .background(Color.Gray, shape = CircleShape)
 
         )
-        Spacer(modifier = Modifier.width(16.dp))
         Column {
             Text(
                 text = "Jawir",
@@ -118,6 +120,15 @@ fun HeaderSection() {
                 fontSize = 20.sp
             )
             Text(text = "jawir@email")
+        }
+        Spacer(modifier = Modifier.width(100.dp))
+        IconButton(onClick = {  }) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.Logout,
+                contentDescription = "Profile Picture",
+                modifier = Modifier
+                    .size(32.dp)
+            )
         }
     }
 }
