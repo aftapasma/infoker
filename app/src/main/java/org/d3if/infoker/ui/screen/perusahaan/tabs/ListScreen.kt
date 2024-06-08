@@ -34,6 +34,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,53 +48,29 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
 import org.d3if.infoker.R
 import org.d3if.infoker.navigation.Screen
-import org.d3if.infoker.ui.screen.component.CompanyBottomBar
+import org.d3if.infoker.repository.AuthRepository
+import org.d3if.infoker.repository.FirestoreRepository
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-val dummyAcceptedApplicants = listOf(
-    mapOf(
-        "name" to "Alice",
-        "jobTitle" to "Software Engineer",
-        "company" to "Tech Corp",
-        "location" to "Jakarta",
-        "salary" to 12000000.0,
-        "createdAt" to Date()
-    ),
-    mapOf(
-        "name" to "Bob",
-        "jobTitle" to "Data Analyst",
-        "company" to "Data Inc.",
-        "location" to "Bandung",
-        "salary" to 10000000.0,
-        "createdAt" to Date()
-    )
-)
-
-val dummyRejectedApplicants = listOf(
-    mapOf(
-        "name" to "Charlie",
-        "jobTitle" to "Product Manager",
-        "company" to "Productive",
-        "location" to "Surabaya",
-        "salary" to 15000000.0,
-        "createdAt" to Date()
-    ),
-    mapOf(
-        "name" to "David",
-        "jobTitle" to "UX Designer",
-        "company" to "Design Studio",
-        "location" to "Bali",
-        "salary" to 9000000.0,
-        "createdAt" to Date()
-    )
-)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListScreen(navController: NavHostController) {
+    val authRepository = AuthRepository()
+    val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
+    val listViewModel = ListViewModel(firestoreRepository)
+
+    val currentUser = authRepository.getCurrentUser()
+    val userEmail = currentUser?.email ?: ""
+
+    val acceptedApplications by listViewModel.getAcceptedApplicationsByCompany(userEmail).observeAsState(initial = emptyList())
+    val rejectedApplications by listViewModel.getRejectedApplicationsByCompany(userEmail).observeAsState(initial = emptyList())
+
     BackHandler {
         navController.navigate(Screen.Home.route)
     }
@@ -112,7 +89,12 @@ fun ListScreen(navController: NavHostController) {
             )
         },
         content = { paddingValues ->
-            ApplicantDetailList(navController = navController, modifier = Modifier.padding(paddingValues))
+            ApplicantDetailList(
+                navController = navController,
+                acceptedApplications = acceptedApplications,
+                rejectedApplications = rejectedApplications,
+                modifier = Modifier.padding(paddingValues)
+            )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
@@ -131,7 +113,12 @@ fun ListScreen(navController: NavHostController) {
 }
 
 @Composable
-fun ApplicantDetailList(navController: NavHostController?, modifier: Modifier = Modifier) {
+fun ApplicantDetailList(
+    navController: NavHostController,
+    acceptedApplications: List<DocumentSnapshot>,
+    rejectedApplications: List<DocumentSnapshot>,
+    modifier: Modifier = Modifier
+) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf("Diterima", "Ditolak")
     val pagerState = rememberPagerState {
@@ -177,59 +164,30 @@ fun ApplicantDetailList(navController: NavHostController?, modifier: Modifier = 
                 .weight(1f)
         ) {
             when (selectedTabIndex) {
-                0 -> ApplicantAccept(navController)
-                1 -> ApplicantRejected(navController)
+                0 -> ApplicantList(navController, acceptedApplications)
+                1 -> ApplicantList(navController, rejectedApplications)
             }
         }
     }
 }
 
 @Composable
-fun ApplicantAccept(navController: NavHostController?) {
+fun ApplicantList(navController: NavHostController, applications: List<DocumentSnapshot>) {
     LazyColumn {
-        if (dummyAcceptedApplicants.isEmpty()) {
-            item {
-                Text("No bookmarks found.")
-            }
-        } else {
-            items(dummyAcceptedApplicants) { document ->
-                val name = document["name"] as? String ?: "N/A"
-                val jobTitle = document["jobTitle"] as? String ?: "N/A"
-                val company = document["company"] as? String ?: "N/A"
-                val location = document["location"] as? String ?: "N/A"
-                val salary = document["salary"] as? Double ?: 0.0
-                val createdAt = document["createdAt"] as? Date ?: Date()
-
-                JobApplicationItem(
-                    name = name,
-                    jobTitle = jobTitle,
-                    company = company,
-                    location = location,
-                    salary = salary,
-                    createdAt = createdAt,
-                    onClick = { navController?.navigate(Screen.JobDetail.withId(name)) }
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-        }
-    }
-}
-
-@Composable
-fun ApplicantRejected(navController: NavHostController?) {
-    LazyColumn {
-        if (dummyRejectedApplicants.isEmpty()) {
+        if (applications.isEmpty()) {
             item {
                 Text("No applications found.")
             }
         } else {
-            items(dummyRejectedApplicants) { document ->
-                val name = document["name"] as? String ?: "N/A"
-                val jobTitle = document["jobTitle"] as? String ?: "N/A"
-                val company = document["company"] as? String ?: "N/A"
-                val location = document["location"] as? String ?: "N/A"
-                val salary = document["salary"] as? Double ?: 0.0
-                val createdAt = document["createdAt"] as? Date ?: Date()
+            items(applications) { document ->
+                val userMap = document["user"] as? Map<String, Any> ?: emptyMap()
+                val jobMap = document["job"] as? Map<String, Any> ?: emptyMap()
+                val name = userMap["name"] as? String ?: "N/A"
+                val jobTitle = jobMap["title"] as? String ?: "N/A"
+                val company = jobMap["createdBy.name"] as? String ?: "N/A"
+                val location = jobMap["location"] as? String ?: "N/A"
+                val salary = jobMap["salary"] as? Double ?: 0.0
+                val createdAt = (document["createdAt"] as? com.google.firebase.Timestamp)?.toDate() ?: Date()
 
                 JobApplicationItem(
                     name = name,
@@ -238,7 +196,7 @@ fun ApplicantRejected(navController: NavHostController?) {
                     location = location,
                     salary = salary,
                     createdAt = createdAt,
-                    onClick = { navController?.navigate(Screen.JobDetail.withId(name)) }
+                    onClick = {  }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
