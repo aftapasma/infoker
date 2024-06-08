@@ -3,6 +3,7 @@ package org.d3if.infoker.ui.screen.user
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -240,9 +241,9 @@ fun JobApplicationItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(8.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .border(1.dp, Color.Black, RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
