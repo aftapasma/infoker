@@ -1,5 +1,6 @@
 package org.d3if.infoker.ui.screen.user
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -55,6 +56,10 @@ fun Profile2(navController: NavHostController) {
     }
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
+
+    BackHandler {
+        navController.navigate(Screen.JobList.route)
+    }
 
     Scaffold(
         bottomBar = {
