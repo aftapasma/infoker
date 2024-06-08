@@ -1,6 +1,7 @@
 package org.d3if.infoker.ui.screen
 
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -54,6 +55,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.firestore.FirebaseFirestore
 import org.d3if.infoker.R
+import org.d3if.infoker.navigation.Screen
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
 import org.d3if.infoker.ui.theme.InfokerTheme
@@ -84,6 +86,10 @@ fun RegisterScreen(navController: NavHostController) {
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
+    }
+
+    BackHandler {
+        navController.navigate(Screen.JobList.route)
     }
 
     Box(
