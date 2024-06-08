@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
 import org.d3if.infoker.ui.screen.user.ActivityViewModel
-import org.d3if.infoker.ui.screen.perusahaan.AddJobViewModel
+import org.d3if.infoker.ui.screen.perusahaan.AddOrEditJobViewModel
 import org.d3if.infoker.ui.screen.perusahaan.ApplicantDetailViewModel
 import org.d3if.infoker.ui.screen.perusahaan.ApplicantListViewModel
 import org.d3if.infoker.ui.screen.perusahaan.tabs.HomeViewModel
@@ -17,8 +17,8 @@ class ViewModelFactory(private val authRepository: AuthRepository, private val f
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {
-            modelClass.isAssignableFrom(AddJobViewModel::class.java) -> {
-                AddJobViewModel(authRepository, firestoreRepository) as T
+            modelClass.isAssignableFrom(AddOrEditJobViewModel::class.java) -> {
+                AddOrEditJobViewModel(authRepository, firestoreRepository) as T
             }
             modelClass.isAssignableFrom(JobListViewModel::class.java) -> {
                 JobListViewModel(firestoreRepository) as T
