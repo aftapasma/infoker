@@ -33,6 +33,7 @@ import org.d3if.infoker.ui.screen.user.JobDetailScreen
 import org.d3if.infoker.ui.screen.user.JobListScreen
 import org.d3if.infoker.ui.screen.user.KEY_JOB_ID
 import org.d3if.infoker.ui.screen.user.Profile2
+import org.d3if.infoker.ui.screen.user.ProfileDetail
 
 @Composable
 fun SetUpNavGraph(navController: NavHostController = rememberNavController()) {
@@ -120,6 +121,9 @@ fun SetUpNavGraph(navController: NavHostController = rememberNavController()) {
             ) { navBackStackEntry ->
                 val applicantId = navBackStackEntry.arguments?.getString(KEY_APPLICANT_ID)
                 ApplicantDetailScreen(navController = navController, applicantId = applicantId)
+            }
+            composable(route = Screen.ProfilDetail.route) {
+                ProfileDetail(navController)
             }
         }
     }

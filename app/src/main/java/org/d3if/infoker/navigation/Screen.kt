@@ -28,4 +28,5 @@ sealed class Screen(val route: String) {
     data object ApplicantDetail: Screen("ApplicantDetailScreen/{$KEY_APPLICANT_ID}") {
         fun withId(applicantId: String) = "ApplicantDetailScreen/$applicantId"
     }
+    data object ProfilDetail: Screen("ProfilDetailScreen")
 }

@@ -1,5 +1,10 @@
 package org.d3if.infoker.ui.screen.user
 
+import android.content.Context
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,12 +17,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.input.TextFieldDecorator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,8 +29,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,27 +40,42 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.d3if.infoker.R
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.google.firebase.storage.FirebaseStorage
 import org.d3if.infoker.ui.theme.InfokerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileDetail() {
+fun ProfileDetail(navController: NavHostController) {
+    val context = LocalContext.current
     var name by remember { mutableStateOf(TextFieldValue("")) }
     var email by remember { mutableStateOf(TextFieldValue("")) }
     var phone by remember { mutableStateOf(TextFieldValue("")) }
     var address by remember { mutableStateOf(TextFieldValue("")) }
+    var showDialog by remember { mutableStateOf(false) }
+    var pendingImageUri: Uri? by remember { mutableStateOf(null) }
+
+
+    val pickImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            pendingImageUri = it
+            showDialog = true
+        }
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Detail profil") },
                 navigationIcon = {
-                    IconButton(onClick = { /* Handle back button */ }) {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
@@ -89,7 +106,7 @@ fun ProfileDetail() {
                         imageVector = Icons.Default.AccountCircle,
                         contentDescription = "Profile Picture",
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.size(128.dp)
+                        modifier = Modifier.size(128.dp).clickable{ pickImageLauncher.launch("image/*") },
                     )
                 }
 
@@ -141,14 +158,55 @@ fun ProfileDetail() {
                     Text("Ganti Akun")
                 }
             }
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    title = { Text("Konfirmasi") },
+                    text = { Text("Apakah Anda yakin ingin menyimpan gambar ini sebagai foto profil?") },
+                    confirmButton = {
+                        Button(onClick = {
+                            pendingImageUri?.let { uri ->
+                                uploadImageToFirebaseStorage(uri, context)
+                            }
+                            showDialog = false
+                        }) {
+                            Text("Ya")
+                        }
+                    },
+                    dismissButton = {
+                        Button(onClick = { showDialog = false }) {
+                            Text("Tidak")
+                        }
+                    }
+                )
+            }
         }
     )
+}
+
+fun uploadImageToFirebaseStorage(imageUri: Uri, context: Context) {
+    val storageRef = FirebaseStorage.getInstance().reference.child("images/${imageUri.lastPathSegment}")
+    val uploadTask = storageRef.putFile(imageUri)
+    uploadTask.addOnSuccessListener {
+        Toast.makeText(context, "Image uploaded successfully", Toast.LENGTH_SHORT).show()
+    }.addOnFailureListener {
+        Toast.makeText(context, "Upload failed: ${it.message}", Toast.LENGTH_SHORT).show()
+    }
+}
+
+fun fetchImageUri(storagePath: String, onResult: (Uri?) -> Unit) {
+    val storageRef = FirebaseStorage.getInstance().getReference(storagePath)
+    storageRef.downloadUrl.addOnSuccessListener { uri ->
+        onResult(uri)
+    }.addOnFailureListener {
+        onResult(null)
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun ProfileDetailPreview() {
     InfokerTheme {
-        ProfileDetail()
+        ProfileDetail(rememberNavController())
     }
 }

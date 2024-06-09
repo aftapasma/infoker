@@ -5,6 +5,7 @@ import BiodataDialog
 import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -130,7 +131,12 @@ fun HeaderSection(authViewModel: AuthViewModel, navController: NavHostController
                 .size(64.dp)
                 .background(Color.Gray, shape = CircleShape)
         )
-        Column {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .clickable { navController.navigate(Screen.ProfilDetail.route) }
+                .padding(start = 16.dp)
+        ) {
             Text(
                 text = userProfile?.name ?: "Loading...",
                 fontWeight = FontWeight.Bold,
@@ -138,7 +144,6 @@ fun HeaderSection(authViewModel: AuthViewModel, navController: NavHostController
             )
             Text(text = userProfile?.email ?: "Loading...")
         }
-        Spacer(modifier = Modifier.width(100.dp))
         IconButton(onClick = { authViewModel.logout(navController) }) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Logout,
