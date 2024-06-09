@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
@@ -44,7 +45,7 @@ fun UserBottomBar(navController: NavHostController) {
                         .weight(1f)
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.baseline_bookmark_border_24),
+                        imageVector = Icons.Default.Bookmark,
                         contentDescription = "Bookmark"
                     )
                 }

@@ -1,10 +1,8 @@
 package org.d3if.infoker.ui.screen.user
-import AuthViewModel
 import android.app.Activity
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,8 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -26,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,9 +34,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,7 +50,6 @@ import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
 import org.d3if.infoker.ui.screen.component.UserBottomBar
 import org.d3if.infoker.ui.theme.InfokerTheme
-import org.d3if.infoker.util.AuthViewModelFactory
 import org.d3if.infoker.util.ViewModelFactory
 import java.text.DateFormat
 import java.util.Date
@@ -68,7 +64,6 @@ fun JobListScreen(
 
     val authRepository = AuthRepository()
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
-    val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(authRepository, firestoreRepository))
 
     val jobListViewModel: JobListViewModel = viewModel(factory = ViewModelFactory(authRepository, firestoreRepository))
     val jobs by jobListViewModel.jobs.observeAsState(initial = emptyList())
@@ -92,7 +87,11 @@ fun JobListScreen(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                }
+                },
+                colors = TopAppBarDefaults.mediumTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.primary
+                )
             )
         },
         bottomBar = {
@@ -141,7 +140,7 @@ fun JobList(
 
 @Composable
 fun JobListItem(job: DocumentSnapshot, onClick: () -> Unit) {
-    val company = "Afta Tunas Jaya Abadi Barokah Tbk."
+    val company = job.getString("createdBy.name") ?: "Unknown Company"
 
     // Extracting job details from DocumentSnapshot
     val title = job.getString("title") ?: ""
@@ -156,7 +155,7 @@ fun JobListItem(job: DocumentSnapshot, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .border(1.dp, Color.Black, RoundedCornerShape(16.dp))
+//            .border(1.dp, Color.Black, RoundedCornerShape(16.dp))
             .clickable(onClick = onClick)
     ) {
         Row(
@@ -167,7 +166,7 @@ fun JobListItem(job: DocumentSnapshot, onClick: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Image(
-                painter = painterResource(id = R.drawable.baseline_android_24),
+                imageVector = Icons.Default.AccountCircle,
                 contentDescription = "Company Logo",
                 modifier = Modifier
                     .size(48.dp)

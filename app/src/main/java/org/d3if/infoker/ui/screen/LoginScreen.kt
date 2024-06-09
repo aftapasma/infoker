@@ -95,10 +95,11 @@ fun LoginScreen(navController: NavHostController) {
         navController.navigate(Screen.JobList.route)
     }
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
+            .verticalScroll(rememberScrollState())
             .background(color = MaterialTheme.colorScheme.primaryContainer)
     ) {
         Column(
@@ -128,21 +129,11 @@ fun LoginScreen(navController: NavHostController) {
                 color = MaterialTheme.colorScheme.primary,
             )
         }
-
-        Box(
-            modifier = Modifier
-                .background(
-                    color = Color.Transparent,
-                    shape = RoundedCornerShape(25.dp, 25.dp)
-                )
-                .align(Alignment.BottomCenter)
-        ) {
-
             Column(
                 modifier = Modifier
                     .padding(16.dp)
                     .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
+                    ,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 //                Spacer(modifier = Modifier.height(50.dp))
@@ -150,7 +141,7 @@ fun LoginScreen(navController: NavHostController) {
                     text = "Masuk",
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .padding(top = 130.dp)
+//                        .padding(top = 130.dp)
                         .fillMaxWidth(),
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.primary,
@@ -217,7 +208,7 @@ fun LoginScreen(navController: NavHostController) {
                 }
                 Spacer(modifier = Modifier.padding(20.dp))
             }
-        }
+
     }
 }
 
