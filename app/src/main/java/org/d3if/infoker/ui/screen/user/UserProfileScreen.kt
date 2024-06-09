@@ -3,9 +3,13 @@ package org.d3if.infoker.ui.screen.user
 import AuthViewModel
 import BiodataDialog
 import android.content.Context
+import android.database.Cursor
 import android.net.Uri
+import android.provider.OpenableColumns
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,13 +24,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddCircleOutline
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
@@ -34,7 +36,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -54,8 +55,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -65,7 +64,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.google.firebase.firestore.FirebaseFirestore
-import org.d3if.infoker.R
+import com.google.firebase.storage.FirebaseStorage
 import org.d3if.infoker.navigation.Screen
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
@@ -113,11 +112,127 @@ fun Profile2(navController: NavHostController) {
                 Spacer(modifier = Modifier.height(16.dp))
                 when (selectedTabIndex) {
                     0 -> Personal(userProfileViewModel)
-                    1 -> CareerHistory()
+                    1 -> Cv()
                 }
             }
         }
     )
+}
+
+@Composable
+fun Cv() {
+    val context = LocalContext.current
+    var fileUri by remember { mutableStateOf<Uri?>(null) }
+    var showDialog by remember {
+        mutableStateOf(false)
+    }
+
+    Column(
+        modifier = Modifier.padding(10.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Cv",
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+            )
+        }
+        if (fileUri == null) {
+            // Text to display if CV is not uploaded
+            Text(
+                text = "Upload CV anda",
+                color = Color.Gray,
+                modifier = Modifier.padding(12.dp)
+            )
+            fileUri?.let {
+                // Memanggil FilePickerButton dengan callback untuk menampilkan dialog
+                FilePickerButton(onFilePicked = { uri -> fileUri = uri }, onUploadClicked = { showDialog = true })
+            } ?: run {
+                FilePickerButton(onFilePicked = { uri -> fileUri = uri }, onUploadClicked = { showDialog = true })
+            }
+        } else {
+            // Text to display if CV is uploaded
+            Text(
+                text = "CV telah diupload",
+                color = Color.Gray,
+                modifier = Modifier.padding(12.dp)
+            )
+        }
+
+        // Tampilkan dialog jika showDialog true
+        if (showDialog) {
+            CvUploadDialog(
+                onDismiss = { showDialog = false },
+                onSave = {
+                    uploadFileToFirebase(fileUri!!, context, onSuccess = {
+                        // Handle success
+                    }, onFailure = {
+                        // Handle failure
+                    })
+                    showDialog = false
+                }
+            )
+        }
+    }
+}
+
+
+
+fun getFileNameFromUri(context: Context, uri: Uri): String? {
+    var result: String? = null
+    if (uri.scheme == "content") {
+        val cursor: Cursor? = context.contentResolver.query(uri, null, null, null, null)
+        cursor.use {
+            if (it != null && it.moveToFirst()) {
+                result = it.getString(it.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME))
+            }
+        }
+    }
+    if (result == null) {
+        result = uri.path
+        val cut = result?.lastIndexOf('/')
+        if (cut != -1) {
+            result = result?.substring(cut!! + 1)
+        }
+    }
+    return result
+}
+
+fun uploadFileToFirebase(uri: Uri, context: Context, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    val fileName = getFileNameFromUri(context, uri)
+    val storageReference = FirebaseStorage.getInstance().reference.child("cv/$fileName")
+    storageReference.putFile(uri)
+        .addOnSuccessListener {
+            Toast.makeText(context, "Upload Successful", Toast.LENGTH_SHORT).show()
+            onSuccess()
+        }
+        .addOnFailureListener { exception ->
+            Toast.makeText(context, "Upload Failed: ${exception.message}", Toast.LENGTH_SHORT).show()
+            onFailure(exception)
+        }
+}
+
+@Composable
+fun FilePickerButton(onFilePicked: (Uri) -> Unit, onUploadClicked: () -> Unit) {
+    val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            onFilePicked(it)
+            onUploadClicked()
+        }
+    }
+
+    OutlinedButton(onClick = { launcher.launch("*/*") }) {
+        Text("Upload")
+    }
 }
 
 @Composable
@@ -150,7 +265,6 @@ fun HeaderSection(authViewModel: AuthViewModel, navController: NavHostController
                 .clip(CircleShape)
                 .background(Color.Gray)
         ) {
-            // Menampilkan gambar profil pengguna dari URI yang diambil dari Firebase
             userProfileImageUri?.let { uri ->
                 Image(
                     painter = rememberImagePainter(uri),
@@ -197,9 +311,7 @@ fun Tab(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
     val tabs = listOf("Tentang Kamu", "Upload CV")
 
     TabRow(
-        selectedTabIndex = selectedTabIndex,
-        containerColor = Color.DarkGray,
-        contentColor = Color.White,
+        selectedTabIndex = selectedTabIndex
     ) {
         tabs.forEachIndexed { index, title ->
             Tab(
