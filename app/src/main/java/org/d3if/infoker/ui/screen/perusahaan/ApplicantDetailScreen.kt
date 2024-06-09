@@ -1,6 +1,9 @@
 package org.d3if.infoker.ui.screen.perusahaan
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -35,6 +39,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
 import org.d3if.infoker.util.ViewModelFactory
@@ -73,7 +78,7 @@ fun ApplicantDetailScreen(navController: NavHostController, applicantId: String?
                 }
             )
         },
-        content = {paddingValues ->
+        content = { paddingValues ->
             applicantDetail?.let { applicant ->
                 ApplicantDetailContent(
                     applicant = applicant,
@@ -81,7 +86,9 @@ fun ApplicantDetailScreen(navController: NavHostController, applicantId: String?
                 )
             } ?: run {
                 Column(
-                    modifier = Modifier.fillMaxSize().padding(16.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -139,6 +146,7 @@ fun ApplicantDetailContent(
     applicant: DocumentSnapshot,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val userMap = applicant["user"] as? Map<String, Any> ?: emptyMap()
     val name = userMap["name"] as? String ?: "Unknown"
     val email = userMap["email"] as? String ?: "Unknown"
@@ -153,7 +161,9 @@ fun ApplicantDetailContent(
         Image(
             imageVector = Icons.Default.AccountCircle,
             contentDescription = "Foto pelamar",
-            modifier = Modifier.size(100.dp).padding(16.dp)
+            modifier = Modifier
+                .size(100.dp)
+                .padding(16.dp)
         )
         Text(text = "Name: $name", color = Color.Black, style = MaterialTheme.typography.titleLarge)
         Text(
@@ -166,7 +176,22 @@ fun ApplicantDetailContent(
             color = Color.Black,
             style = MaterialTheme.typography.titleSmall
         )
-//        Text(text = "Phone Number: ${applicant.phoneNumber}", color = Color.Black,  style = MaterialTheme.typography.titleSmall,)
+        Button(onClick = {
+            fetchFileUrl(email, context)
+        }) {
+            Text(text = "Download CV")
+        }
+    }
+}
+
+fun fetchFileUrl(userEmail: String, context: Context) {
+    val storageReference = FirebaseStorage.getInstance().reference.child("cv/$userEmail")
+    storageReference.downloadUrl.addOnSuccessListener { uri ->
+        // Handle successful download URL retrieval
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        context.startActivity(intent)
+    }.addOnFailureListener { exception ->
+        // Handle failure
     }
 }
 

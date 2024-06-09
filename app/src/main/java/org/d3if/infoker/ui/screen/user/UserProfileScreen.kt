@@ -112,7 +112,7 @@ fun Profile2(navController: NavHostController) {
                 Spacer(modifier = Modifier.height(16.dp))
                 when (selectedTabIndex) {
                     0 -> Personal(userProfileViewModel)
-                    1 -> Cv()
+                    1 -> Cv(currentUser?.email ?: "")
                 }
             }
         }
@@ -120,7 +120,7 @@ fun Profile2(navController: NavHostController) {
 }
 
 @Composable
-fun Cv() {
+fun Cv(userEmail: String) {
     val context = LocalContext.current
     var fileUri by remember { mutableStateOf<Uri?>(null) }
     var showDialog by remember {
@@ -170,7 +170,7 @@ fun Cv() {
             CvUploadDialog(
                 onDismiss = { showDialog = false },
                 onSave = {
-                    uploadFileToFirebase(fileUri!!, context, onSuccess = {
+                    uploadFileToFirebase(fileUri!!, context, userEmail, onSuccess = {
                         // Handle success
                     }, onFailure = {
                         // Handle failure
@@ -182,31 +182,8 @@ fun Cv() {
     }
 }
 
-
-
-fun getFileNameFromUri(context: Context, uri: Uri): String? {
-    var result: String? = null
-    if (uri.scheme == "content") {
-        val cursor: Cursor? = context.contentResolver.query(uri, null, null, null, null)
-        cursor.use {
-            if (it != null && it.moveToFirst()) {
-                result = it.getString(it.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME))
-            }
-        }
-    }
-    if (result == null) {
-        result = uri.path
-        val cut = result?.lastIndexOf('/')
-        if (cut != -1) {
-            result = result?.substring(cut!! + 1)
-        }
-    }
-    return result
-}
-
-fun uploadFileToFirebase(uri: Uri, context: Context, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-    val fileName = getFileNameFromUri(context, uri)
-    val storageReference = FirebaseStorage.getInstance().reference.child("cv/$fileName")
+fun uploadFileToFirebase(uri: Uri, context: Context, userEmail: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    val storageReference = FirebaseStorage.getInstance().reference.child("cv/$userEmail")
     storageReference.putFile(uri)
         .addOnSuccessListener {
             Toast.makeText(context, "Upload Successful", Toast.LENGTH_SHORT).show()
