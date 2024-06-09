@@ -57,6 +57,7 @@ import org.d3if.infoker.R
 import org.d3if.infoker.navigation.Screen
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
+import org.d3if.infoker.ui.screen.component.CompanyBottomBar
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -111,9 +112,9 @@ fun ListScreen(navController: NavHostController) {
                 )
             }
         },
-//        bottomBar = {
-//            CompanyBottomBar(navController = navController)
-//        }
+        bottomBar = {
+            CompanyBottomBar(navController = navController)
+        }
     )
 
     if (showDialog) {
