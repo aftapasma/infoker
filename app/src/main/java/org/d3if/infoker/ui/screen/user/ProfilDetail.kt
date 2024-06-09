@@ -44,17 +44,27 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
-import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.storage
 import org.d3if.infoker.repository.AuthRepository
+import org.d3if.infoker.repository.FirestoreRepository
+import org.d3if.infoker.util.ViewModelFactory
+
+const val KEY_PROFIL_ID = "profilId"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileDetail(navController: NavHostController, authRepository: AuthRepository) {
+fun ProfileDetail(
+    navController: NavHostController,
+    profilId: String? = null
+) {
+    val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
+    val authRepository = AuthRepository()
+    val viewModel: ProfileDetailViewModel = viewModel(factory = ViewModelFactory(authRepository, firestoreRepository))
+
     val context = LocalContext.current
     var name by remember { mutableStateOf(TextFieldValue("")) }
     var email by remember { mutableStateOf(TextFieldValue("")) }
@@ -65,26 +75,10 @@ fun ProfileDetail(navController: NavHostController, authRepository: AuthReposito
     val user = authRepository.getCurrentUser()
     val userEmail = user?.email ?: "default_user"
 
-    // Menambahkan state untuk URI gambar pengguna
-    var userProfileImageUri by remember { mutableStateOf<Uri?>(null) }
-
     // Memuat URI gambar pengguna dari Firebase saat komponen dilakukan komposisi ulang
     LaunchedEffect(userEmail) {
-        fetchUserProfileImage(userEmail,
-            onSuccess = { uri ->
-                // Mengatur URI gambar pengguna saat berhasil diambil
-                userProfileImageUri = uri
-            },
-            onFailure = {
-                // Menangani kasus gagal mengambil URI gambar pengguna
-                Toast.makeText(context, "Failed to load profile image", Toast.LENGTH_SHORT).show()
-            }
-        )
+        viewModel.fetchPhotoUrl()
     }
-
-    val storage = Firebase.storage
-    val storageRef = storage.reference
-    val imageRef = storageRef.child("$userEmail.png")
 
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -128,7 +122,7 @@ fun ProfileDetail(navController: NavHostController, authRepository: AuthReposito
                     contentAlignment = Alignment.Center
                 ) {
                     // Menampilkan gambar profil pengguna dari URI yang diambil dari Firebase
-                    userProfileImageUri?.let { uri ->
+                    viewModel.photoUrl?.let { uri ->
                         Image(
                             painter = rememberImagePainter(uri),
                             contentDescription = "Profile Picture",
@@ -181,18 +175,6 @@ fun ProfileDetail(navController: NavHostController, authRepository: AuthReposito
                     label = { Text("Alamat") },
                     modifier = Modifier.fillMaxWidth()
                 )
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Button(onClick = { /* Handle logout action */ }) {
-                    Text("Keluar")
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(onClick = { /* Handle change account action */ }) {
-                    Text("Ganti Akun")
-                }
             }
             if (showDialog) {
                 AlertDialog(
@@ -202,7 +184,7 @@ fun ProfileDetail(navController: NavHostController, authRepository: AuthReposito
                     confirmButton = {
                         Button(onClick = {
                             pendingImageUri?.let { uri ->
-                                uploadImageToFirebase(authRepository, userEmail, uri, context)
+                                uploadImageToFirebase(viewModel, userEmail, uri, context)
                             }
                             showDialog = false
                         }) {
@@ -220,8 +202,12 @@ fun ProfileDetail(navController: NavHostController, authRepository: AuthReposito
     )
 }
 
-
-fun uploadImageToFirebase(authRepository: AuthRepository, userEmail: String, imageUri: Uri, context: Context) {
+fun uploadImageToFirebase(
+    viewModel: ProfileDetailViewModel,
+    userEmail: String,
+    imageUri: Uri,
+    context: Context
+) {
     val storageRef = FirebaseStorage.getInstance().reference.child("images/$userEmail")
     val firestoreRef = FirebaseFirestore.getInstance()
 
@@ -233,12 +219,8 @@ fun uploadImageToFirebase(authRepository: AuthRepository, userEmail: String, ima
     }.addOnCompleteListener { task ->
         if (task.isSuccessful) {
             val downloadUrl = task.result.toString()
-            val userDoc = firestoreRef.collection("users").document(userEmail)
-            userDoc.set(mapOf("profileImageUrl" to downloadUrl)).addOnSuccessListener {
-                Toast.makeText(context, "Image uploaded successfully", Toast.LENGTH_SHORT).show()
-            }.addOnFailureListener { e ->
-                Toast.makeText(context, "Failed to upload image: ${e.message}", Toast.LENGTH_LONG).show()
-            }
+            viewModel.savePhotoUrl(downloadUrl)
+            Toast.makeText(context, "Image uploaded successfully", Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(context, "Failed to upload image", Toast.LENGTH_LONG).show()
         }

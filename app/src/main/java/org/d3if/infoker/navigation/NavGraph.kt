@@ -123,7 +123,7 @@ fun SetUpNavGraph(navController: NavHostController = rememberNavController()) {
                 ApplicantDetailScreen(navController = navController, applicantId = applicantId)
             }
             composable(route = Screen.ProfilDetail.route) {
-                ProfileDetail(navController, authRepository)
+                ProfileDetail(navController)
             }
         }
     }

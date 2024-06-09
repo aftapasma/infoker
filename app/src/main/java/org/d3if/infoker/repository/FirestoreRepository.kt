@@ -473,4 +473,33 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
             false
         }
     }
+
+    suspend fun savePhotoUrl(email: String, photoUrl: String): Boolean {
+        return try {
+            val userQuery = db.collection("users").whereEqualTo("email", email).get().await()
+            if (userQuery.documents.isNotEmpty()) {
+                val userDocument = userQuery.documents[0]
+                userDocument.reference.update("photoProfileUrl", photoUrl).await()
+                true
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    suspend fun getPhotoUrl(email: String): String? {
+        return try {
+            val userQuery = db.collection("users").whereEqualTo("email", email).get().await()
+            if (userQuery.documents.isNotEmpty()) {
+                val userDocument = userQuery.documents[0]
+                userDocument.getString("photoProfileUrl")
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
 }

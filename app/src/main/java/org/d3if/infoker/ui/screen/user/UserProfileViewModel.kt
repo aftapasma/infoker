@@ -54,4 +54,23 @@ class UserProfileViewModel(
             }
         }
     }
+
+    fun savePhotoUrl(photoUrl: String) {
+        val user = authRepository.getCurrentUser()
+        user?.let {
+            viewModelScope.launch {
+                firestoreRepository.savePhotoUrl(it.email ?: "", photoUrl)
+            }
+        }
+    }
+
+    fun getPhotoUrl(callback: (String?) -> Unit) {
+        val user = authRepository.getCurrentUser()
+        user?.let {
+            viewModelScope.launch {
+                val photoUrl = firestoreRepository.getPhotoUrl(it.email ?: "")
+                callback(photoUrl)
+            }
+        }
+    }
 }

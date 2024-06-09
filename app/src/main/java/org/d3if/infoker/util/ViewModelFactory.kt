@@ -10,8 +10,10 @@ import org.d3if.infoker.ui.screen.perusahaan.ApplicantDetailViewModel
 import org.d3if.infoker.ui.screen.perusahaan.ApplicantListViewModel
 import org.d3if.infoker.ui.screen.perusahaan.tabs.HomeViewModel
 import org.d3if.infoker.ui.screen.perusahaan.tabs.ListViewModel
+import org.d3if.infoker.ui.screen.perusahaan.tabs.ProfilViewModel
 import org.d3if.infoker.ui.screen.user.JobDetailViewModel
 import org.d3if.infoker.ui.screen.user.JobListViewModel
+import org.d3if.infoker.ui.screen.user.ProfileDetailViewModel
 import org.d3if.infoker.ui.screen.user.UserProfileViewModel
 
 class ViewModelFactory(
@@ -47,6 +49,12 @@ class ViewModelFactory(
             }
             modelClass.isAssignableFrom(UserProfileViewModel::class.java) -> {
                 UserProfileViewModel(authRepository, firestoreRepository) as T
+            }
+            modelClass.isAssignableFrom(ProfilViewModel::class.java) -> {
+                ProfilViewModel(authRepository, firestoreRepository) as T
+            }
+            modelClass.isAssignableFrom(ProfileDetailViewModel::class.java) -> {
+                ProfileDetailViewModel(authRepository, firestoreRepository) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel Class")
         }

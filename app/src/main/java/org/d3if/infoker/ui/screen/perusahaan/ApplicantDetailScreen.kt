@@ -2,13 +2,16 @@ package org.d3if.infoker.ui.screen.perusahaan
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
@@ -25,14 +28,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberImagePainter
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import org.d3if.infoker.repository.AuthRepository
@@ -73,15 +83,18 @@ fun ApplicantDetailScreen(navController: NavHostController, applicantId: String?
                 }
             )
         },
-        content = {paddingValues ->
+        content = { paddingValues ->
             applicantDetail?.let { applicant ->
                 ApplicantDetailContent(
                     applicant = applicant,
-                    modifier = Modifier.padding(paddingValues)
+                    modifier = Modifier.padding(paddingValues),
+                    viewModel = applicantDetailViewModel
                 )
             } ?: run {
                 Column(
-                    modifier = Modifier.fillMaxSize().padding(16.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -137,12 +150,21 @@ fun ApplicantDetailScreen(navController: NavHostController, applicantId: String?
 @Composable
 fun ApplicantDetailContent(
     applicant: DocumentSnapshot,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: ApplicantDetailViewModel
 ) {
     val userMap = applicant["user"] as? Map<String, Any> ?: emptyMap()
     val name = userMap["name"] as? String ?: "Unknown"
     val email = userMap["email"] as? String ?: "Unknown"
     val createdAt = (applicant["createdAt"] as? com.google.firebase.Timestamp)?.toDate() ?: Date()
+    val context = LocalContext.current
+
+    var photoUrl by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(email) {
+        val url = viewModel.getUserPhotoUrl(email)
+        photoUrl = url
+    }
 
     Column(
         modifier = modifier
@@ -150,11 +172,30 @@ fun ApplicantDetailContent(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            imageVector = Icons.Default.AccountCircle,
-            contentDescription = "Foto pelamar",
-            modifier = Modifier.size(100.dp).padding(16.dp)
-        )
+        Box(
+            modifier = Modifier
+                .size(100.dp)
+                .clip(CircleShape)
+                .background(Color.Gray)
+        ) {
+            photoUrl?.let { url ->
+                Image(
+                    painter = rememberImagePainter(url),
+                    contentDescription = "Applicant Photo",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                )
+            } ?: Icon(
+                imageVector = Icons.Default.AccountCircle,
+                contentDescription = "Profile Picture",
+                modifier = Modifier
+                    .size(100.dp)
+                    .padding(16.dp)
+            )
+        }
+
         Text(text = "Name: $name", color = Color.Black, style = MaterialTheme.typography.titleLarge)
         Text(
             text = "Email: $email",
@@ -169,6 +210,7 @@ fun ApplicantDetailContent(
 //        Text(text = "Phone Number: ${applicant.phoneNumber}", color = Color.Black,  style = MaterialTheme.typography.titleSmall,)
     }
 }
+
 
 @Preview
 @Composable

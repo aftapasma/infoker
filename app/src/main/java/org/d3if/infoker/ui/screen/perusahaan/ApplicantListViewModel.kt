@@ -21,4 +21,8 @@ class ApplicantListViewModel(private val firestoreRepository: FirestoreRepositor
             _applicants.value = applications
         }
     }
+
+    suspend fun getUserPhotoUrl(email: String): String? {
+        return firestoreRepository.getPhotoUrl(email)
+    }
 }

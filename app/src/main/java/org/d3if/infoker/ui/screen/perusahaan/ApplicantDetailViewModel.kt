@@ -24,4 +24,8 @@ class ApplicantDetailViewModel(private val firestoreRepository: FirestoreReposit
             firestoreRepository.updateApplicationStatus(applicationId, status)
         }
     }
+
+    suspend fun getUserPhotoUrl(email: String): String? {
+        return firestoreRepository.getPhotoUrl(email)
+    }
 }
