@@ -12,7 +12,7 @@ import org.d3if.infoker.ui.screen.perusahaan.tabs.HomeViewModel
 import org.d3if.infoker.ui.screen.perusahaan.tabs.ListViewModel
 import org.d3if.infoker.ui.screen.user.JobDetailViewModel
 import org.d3if.infoker.ui.screen.user.JobListViewModel
-//import org.d3if.infoker.ui.screen.user.UserProfileViewModel
+import org.d3if.infoker.ui.screen.user.UserProfileViewModel
 
 class ViewModelFactory(
     private val authRepository: AuthRepository,
