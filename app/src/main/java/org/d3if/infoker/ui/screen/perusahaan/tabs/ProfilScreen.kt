@@ -1,4 +1,7 @@
+import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -7,10 +10,17 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -18,11 +28,14 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberImagePainter
 import com.google.firebase.firestore.FirebaseFirestore
 import org.d3if.infoker.model.UserProfile
+import org.d3if.infoker.navigation.Screen
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
 import org.d3if.infoker.ui.screen.component.CompanyBottomBar
+import org.d3if.infoker.ui.screen.user.fetchUserProfileImage
 import org.d3if.infoker.ui.theme.InfokerTheme
 import org.d3if.infoker.util.AuthViewModelFactory
 
@@ -60,24 +73,57 @@ fun ProfilScreen(navController: NavHostController) {
 
 @Composable
 fun HeaderCompany(authViewModel: AuthViewModel, navController: NavHostController, userProfile: UserProfile?) {
+    val userProfile by authViewModel.userProfile.observeAsState()
+
+    var userProfileImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    LaunchedEffect(userProfile?.email) {
+        fetchUserProfileImage(userProfile?.email ?: "",
+            onSuccess = { uri ->
+                userProfileImageUri = uri
+            },
+            onFailure = {
+
+            }
+        )
+    }
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colorScheme.primaryContainer,
-            )
+            .background(color = MaterialTheme.colorScheme.primaryContainer)
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = Icons.Default.AccountCircle,
-            contentDescription = "Profile Picture",
+        Box(
             modifier = Modifier
                 .size(64.dp)
-                .background(Color.Gray, shape = CircleShape)
-        )
-        Column {
+                .clip(CircleShape)
+                .background(Color.Gray)
+        ) {
+            userProfileImageUri?.let { uri ->
+                Image(
+                    painter = rememberImagePainter(uri),
+                    contentDescription = "Profile Picture",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } ?: run {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = "Profile Picture",
+                    modifier = Modifier.fillMaxSize(),
+                    tint = Color.White
+                )
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .clickable { navController.navigate(Screen.ProfilDetail.route) }
+                .padding(start = 16.dp)
+        ) {
             Text(
                 text = userProfile?.name ?: "Loading...",
                 fontWeight = FontWeight.Bold,
@@ -85,7 +131,6 @@ fun HeaderCompany(authViewModel: AuthViewModel, navController: NavHostController
             )
             Text(text = userProfile?.email ?: "Loading...")
         }
-        Spacer(modifier = Modifier.width(100.dp))
         IconButton(onClick = { authViewModel.logout(navController) }) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Logout,

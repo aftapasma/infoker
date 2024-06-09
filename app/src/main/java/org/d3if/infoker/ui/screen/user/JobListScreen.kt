@@ -30,10 +30,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -42,6 +45,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberImagePainter
+import coil.transform.CircleCropTransformation
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import org.d3if.infoker.R
@@ -115,9 +120,12 @@ fun JobListScreen(
                     placeholder = { Text("Search jobs") },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") }
                 ) {
-
                 }
-                JobList(jobs = jobs, modifier = Modifier.weight(1f)) {navController.navigate(Screen.JobDetail.withId(it.id))}
+                JobList(
+                    jobs = jobs,
+                    jobListViewModel = jobListViewModel,
+                    modifier = Modifier.weight(1f)
+                ) { navController.navigate(Screen.JobDetail.withId(it.id)) }
             }
         }
     )
@@ -126,6 +134,7 @@ fun JobListScreen(
 @Composable
 fun JobList(
     jobs: List<DocumentSnapshot>,
+    jobListViewModel: JobListViewModel,
     modifier: Modifier = Modifier,
     onClick: (DocumentSnapshot) -> Unit
 ) {
@@ -133,14 +142,15 @@ fun JobList(
         modifier = modifier.fillMaxSize()
     ) {
         items(jobs) { job ->
-            JobListItem(job = job, onClick = {onClick(job)})
+            JobListItem(job = job, jobListViewModel = jobListViewModel, onClick = { onClick(job) })
         }
     }
 }
 
 @Composable
-fun JobListItem(job: DocumentSnapshot, onClick: () -> Unit) {
+fun JobListItem(job: DocumentSnapshot, jobListViewModel: JobListViewModel, onClick: () -> Unit) {
     val company = job.getString("createdBy.name") ?: "Unknown Company"
+    val email = job.getString("createdBy.email") ?: ""
 
     // Extracting job details from DocumentSnapshot
     val title = job.getString("title") ?: ""
@@ -150,12 +160,17 @@ fun JobListItem(job: DocumentSnapshot, onClick: () -> Unit) {
 
     val formattedDate = DateFormat.getDateInstance().format(date)
 
+    var photoProfileUrl by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(email) {
+        photoProfileUrl = jobListViewModel.getUserPhotoUrl(email)
+    }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-//            .border(1.dp, Color.Black, RoundedCornerShape(16.dp))
             .clickable(onClick = onClick)
     ) {
         Row(
@@ -165,13 +180,30 @@ fun JobListItem(job: DocumentSnapshot, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Image(
-                imageVector = Icons.Default.AccountCircle,
-                contentDescription = "Company Logo",
-                modifier = Modifier
-                    .size(48.dp)
-                    .padding(8.dp)
-            )
+            if (photoProfileUrl != null) {
+                Image(
+                    painter = rememberImagePainter(
+                        data = photoProfileUrl,
+                        builder = {
+                            transformations(CircleCropTransformation())
+                        }
+                    ),
+                    contentDescription = "Company Logo",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .padding(8.dp)
+                )
+            } else {
+                Image(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = "Company Logo",
+                    modifier = Modifier
+                        .size(48.dp)
+                        .padding(8.dp)
+                )
+            }
+
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -184,13 +216,6 @@ fun JobListItem(job: DocumentSnapshot, onClick: () -> Unit) {
                 Text(text = stringResource(id = R.string.salary_format, salary), style = MaterialTheme.typography.titleSmall)
                 Text(text = formattedDate, style = MaterialTheme.typography.titleSmall)
             }
-//            Image(
-//                painter = painterResource(id = R.drawable.baseline_bookmark_border_24),
-//                contentDescription = "Bookmark",
-//                modifier = Modifier
-//                    .size(45.dp)
-//                    .padding(8.dp)
-//            )
         }
     }
 }

@@ -35,4 +35,8 @@ class JobListViewModel(private val firestoreRepository: FirestoreRepository) : V
         }
         _jobs.value = filteredJobs
     }
+
+    suspend fun getUserPhotoUrl(email: String): String? {
+        return firestoreRepository.getPhotoUrl(email)
+    }
 }
