@@ -271,7 +271,7 @@ fun ApplicantList(
                     location = location,
                     email = email,
                     createdAt = createdAt,
-                    onClick = { /* Handle click */ },
+                    onClick = { navController.navigate(Screen.ApplicantDetail.withId(document.id)) },
                     onCheckedChange = onApplicationSelected,
                     isChecked = checkboxStates[document.id] ?: false
                 )
