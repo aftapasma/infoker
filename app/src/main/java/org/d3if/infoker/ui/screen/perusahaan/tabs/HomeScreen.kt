@@ -156,6 +156,7 @@ fun ListItem(homeViewModel: HomeViewModel, job: DocumentSnapshot, navController:
                     contentDescription = "Edit"
                 )
             }
+
         }
     }
 }

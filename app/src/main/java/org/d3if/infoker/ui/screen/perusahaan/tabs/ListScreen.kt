@@ -71,8 +71,14 @@ fun ListScreen(navController: NavHostController) {
     val currentUser = authRepository.getCurrentUser()
     val userEmail = currentUser?.email ?: ""
 
-    val acceptedApplications by listViewModel.getAcceptedApplicationsByCompany(userEmail).observeAsState(initial = emptyList())
-    val rejectedApplications by listViewModel.getRejectedApplicationsByCompany(userEmail).observeAsState(initial = emptyList())
+    var refreshTrigger by remember { mutableStateOf(false) }
+    var checkboxStates by remember { mutableStateOf(mutableMapOf<String, Boolean>()) }
+    var selectedApplicationIds by remember { mutableStateOf(listOf<String>()) }
+
+    val acceptedApplications by listViewModel.getAcceptedApplicationsByCompany(userEmail)
+        .observeAsState(initial = emptyList())
+    val rejectedApplications by listViewModel.getRejectedApplicationsByCompany(userEmail)
+        .observeAsState(initial = emptyList())
 
     var showDialog by remember { mutableStateOf(false) }
 
@@ -97,6 +103,15 @@ fun ListScreen(navController: NavHostController) {
                 navController = navController,
                 acceptedApplications = acceptedApplications,
                 rejectedApplications = rejectedApplications,
+                onApplicationSelected = { applicationId, isSelected ->
+                    selectedApplicationIds = if (isSelected) {
+                        selectedApplicationIds + applicationId
+                    } else {
+                        selectedApplicationIds - applicationId
+                    }
+                    checkboxStates[applicationId] = isSelected
+                },
+                checkboxStates = checkboxStates,
                 modifier = Modifier.padding(paddingValues)
             )
         },
@@ -111,9 +126,6 @@ fun ListScreen(navController: NavHostController) {
                 )
             }
         },
-//        bottomBar = {
-//            CompanyBottomBar(navController = navController)
-//        }
     )
 
     if (showDialog) {
@@ -124,7 +136,13 @@ fun ListScreen(navController: NavHostController) {
             confirmButton = {
                 Button(
                     onClick = {
-                        // Lakukan tindakan penghapusan data di sini
+                        listViewModel.deleteMarkedApplications(selectedApplicationIds)
+                            .observeForever { success ->
+                                if (success) {
+                                    refreshTrigger = !refreshTrigger
+                                    checkboxStates.clear()
+                                }
+                            }
                         showDialog = false
                     }) {
                     Text("Hapus")
@@ -138,6 +156,11 @@ fun ListScreen(navController: NavHostController) {
             }
         )
     }
+
+    LaunchedEffect(refreshTrigger) {
+        listViewModel.getAcceptedApplicationsByCompany(userEmail)
+        listViewModel.getRejectedApplicationsByCompany(userEmail)
+    }
 }
 
 @Composable
@@ -145,6 +168,8 @@ fun ApplicantDetailList(
     navController: NavHostController,
     acceptedApplications: List<DocumentSnapshot>,
     rejectedApplications: List<DocumentSnapshot>,
+    onApplicationSelected: (String, Boolean) -> Unit,
+    checkboxStates: Map<String, Boolean>,
     modifier: Modifier = Modifier
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
@@ -192,15 +217,31 @@ fun ApplicantDetailList(
                 .weight(1f)
         ) {
             when (selectedTabIndex) {
-                0 -> ApplicantList(navController, acceptedApplications)
-                1 -> ApplicantList(navController, rejectedApplications)
+                0 -> ApplicantList(
+                    navController,
+                    acceptedApplications,
+                    onApplicationSelected,
+                    checkboxStates
+                )
+
+                1 -> ApplicantList(
+                    navController,
+                    rejectedApplications,
+                    onApplicationSelected,
+                    checkboxStates
+                )
             }
         }
     }
 }
 
 @Composable
-fun ApplicantList(navController: NavHostController, applications: List<DocumentSnapshot>) {
+fun ApplicantList(
+    navController: NavHostController,
+    applications: List<DocumentSnapshot>,
+    onApplicationSelected: (String, Boolean) -> Unit,
+    checkboxStates: Map<String, Boolean>
+) {
     LazyColumn {
         if (applications.isEmpty()) {
             item {
@@ -215,16 +256,20 @@ fun ApplicantList(navController: NavHostController, applications: List<DocumentS
                 val company = jobMap["createdBy.name"] as? String ?: "N/A"
                 val location = jobMap["location"] as? String ?: "N/A"
                 val salary = jobMap["salary"] as? Double ?: 0.0
-                val createdAt = (document["createdAt"] as? com.google.firebase.Timestamp)?.toDate() ?: Date()
+                val createdAt =
+                    (document["createdAt"] as? com.google.firebase.Timestamp)?.toDate() ?: Date()
 
                 JobApplicationItem(
+                    applicationId = document.id,
                     name = name,
                     jobTitle = jobTitle,
                     company = company,
                     location = location,
                     salary = salary,
                     createdAt = createdAt,
-                    onClick = {  }
+                    onClick = { },
+                    onCheckedChange = onApplicationSelected,
+                    isChecked = checkboxStates[document.id] ?: false
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -234,17 +279,20 @@ fun ApplicantList(navController: NavHostController, applications: List<DocumentS
 
 @Composable
 fun JobApplicationItem(
+    applicationId: String,
     name: String,
     jobTitle: String,
     company: String,
     location: String,
     salary: Double,
     createdAt: Date,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onCheckedChange: (String, Boolean) -> Unit,
+    isChecked: Boolean
 ) {
     val formattedDate = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(createdAt)
     var checked by remember {
-        mutableStateOf(false)
+        mutableStateOf(isChecked)
     }
 
     Card(
@@ -258,7 +306,7 @@ fun JobApplicationItem(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column (
+            Column(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(text = name, style = MaterialTheme.typography.titleLarge)
@@ -268,12 +316,18 @@ fun JobApplicationItem(
                 )
                 Text(text = company, style = MaterialTheme.typography.titleMedium)
                 Text(text = location, style = MaterialTheme.typography.titleSmall)
-                Text(text = stringResource(id = R.string.salary_format, salary), style = MaterialTheme.typography.titleSmall)
+                Text(
+                    text = stringResource(id = R.string.salary_format, salary),
+                    style = MaterialTheme.typography.titleSmall
+                )
                 Text(text = formattedDate, style = MaterialTheme.typography.titleSmall)
             }
             Checkbox(
                 checked = checked,
-                onCheckedChange = {checked = it},
+                onCheckedChange = {
+                    checked = it
+                    onCheckedChange(applicationId, it)
+                },
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
                     .padding(end = 16.dp)
