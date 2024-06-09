@@ -26,6 +26,7 @@ import org.d3if.infoker.ui.screen.perusahaan.ApplicantListScreen
 import org.d3if.infoker.ui.screen.perusahaan.KEY_APPLICANT_ID
 import org.d3if.infoker.ui.screen.perusahaan.KEY_COMPANYJOB_ID
 import org.d3if.infoker.ui.screen.perusahaan.KEY_EDITJOB_ID
+import org.d3if.infoker.ui.screen.perusahaan.tabs.DetailProfilCompany
 import org.d3if.infoker.ui.screen.perusahaan.tabs.HomeScreen
 import org.d3if.infoker.ui.screen.perusahaan.tabs.ListScreen
 import org.d3if.infoker.ui.screen.user.ActivityScreen
@@ -124,6 +125,9 @@ fun SetUpNavGraph(navController: NavHostController = rememberNavController()) {
             }
             composable(route = Screen.ProfilDetail.route) {
                 ProfileDetail(navController)
+            }
+            composable(route = Screen.ProfilDetailCompany.route) {
+                DetailProfilCompany(rememberNavController())
             }
         }
     }
