@@ -261,7 +261,7 @@ fun ApplicantList(
                 val name = userMap["name"] as? String ?: "Nama Kosong"
                 val jobTitle = jobMap["title"] as? String ?: "Pekerjaan kosong"
                 val location = jobMap["location"] as? String ?: "lokasi kosong"
-                val salary = jobMap["salary"] as? Double ?: 0.0
+                val email = userMap["email"] as? String ?: "Email Kosong"
                 val createdAt = (document["createdAt"] as? com.google.firebase.Timestamp)?.toDate() ?: Date()
 
                 JobApplicationItem(
@@ -269,7 +269,7 @@ fun ApplicantList(
                     name = name,
                     jobTitle = jobTitle,
                     location = location,
-                    salary = salary,
+                    email = email,
                     createdAt = createdAt,
                     onClick = { /* Handle click */ },
                     onCheckedChange = onApplicationSelected,
@@ -287,7 +287,7 @@ fun JobApplicationItem(
     name: String,
     jobTitle: String,
     location: String,
-    salary: Double,
+    email: String,
     createdAt: Date,
     onClick: () -> Unit,
     onCheckedChange: (String, Boolean) -> Unit,
@@ -316,8 +316,8 @@ fun JobApplicationItem(
                     text = jobTitle,
                     style = MaterialTheme.typography.titleMedium,
                 )
+                Text(text = email, style = MaterialTheme.typography.titleSmall)
                 Text(text = location, style = MaterialTheme.typography.titleSmall)
-                Text(text = stringResource(id = R.string.salary_format, salary), style = MaterialTheme.typography.titleSmall)
                 Text(text = formattedDate, style = MaterialTheme.typography.titleSmall)
             }
             Checkbox(
