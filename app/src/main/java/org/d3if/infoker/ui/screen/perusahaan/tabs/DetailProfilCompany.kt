@@ -156,12 +156,12 @@ fun DetailProfilCompany(navController: NavHostController) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text("Nama Lengkap") },
-                    modifier = Modifier.fillMaxWidth()
-                )
+//                OutlinedTextField(
+//                    value = name,
+//                    onValueChange = { name = it },
+//                    label = { Text("Nama Lengkap") },
+//                    modifier = Modifier.fillMaxWidth()
+//                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 

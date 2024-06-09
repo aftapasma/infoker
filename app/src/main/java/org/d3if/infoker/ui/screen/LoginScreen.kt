@@ -174,8 +174,8 @@ fun LoginScreen(navController: NavHostController) {
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
-                Spacer(modifier = Modifier.padding(10.dp))
-                SosialMediaLogin()
+//                Spacer(modifier = Modifier.padding(10.dp))
+//                SosialMediaLogin()
                 Spacer(modifier = Modifier.padding(10.dp))
                 Text(
                     text = "Belum Punya Akun ?",
