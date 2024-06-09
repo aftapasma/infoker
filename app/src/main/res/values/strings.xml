@@ -10,4 +10,6 @@
     <string name="tambah_pekerjaan">Tambah pekerjaan</string>
     <string name="hapus">Hapus</string>
     <string name="logo_infoker">Infoker_logo</string>
+    <string name="isi_biodata">Isi biodata disini</string>
+    <string name="simpan">simpan</string>
 </resources>
