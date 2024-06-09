@@ -160,9 +160,12 @@ fun LoginScreen(navController: NavHostController) {
                     cornerRadius = cornerRadius,
                     roundedCornerShape = RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp),
                     onClick = {
-                        authViewModel.signIn(email, password, navController)
-                        Toast.makeText(context, "Attempting to sign in...", Toast.LENGTH_SHORT)
-                            .show()
+                        if (email.isEmpty() || password.isEmpty()) {
+                            Toast.makeText(context, "Email dan Password tidak boleh kosong", Toast.LENGTH_SHORT).show()
+                        } else {
+                            authViewModel.signIn(email, password, navController)
+                            Toast.makeText(context, "Attempting to sign in...", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 )
                 Spacer(modifier = Modifier.padding(5.dp))
