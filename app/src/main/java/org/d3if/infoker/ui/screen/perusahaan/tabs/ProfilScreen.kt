@@ -19,6 +19,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.firestore.FirebaseFirestore
+import org.d3if.infoker.model.UserProfile
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
 import org.d3if.infoker.ui.screen.component.CompanyBottomBar

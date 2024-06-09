@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
+import org.d3if.infoker.model.UserProfile
 import org.d3if.infoker.navigation.Screen
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.AuthResult
@@ -71,7 +72,7 @@ class AuthViewModel(private val authRepository: AuthRepository, private val fire
         user?.let { fetchUserProfile(it.email!!) }
     }
 
-    private fun fetchUserProfile(email: String) {
+    fun fetchUserProfile(email: String) {
         viewModelScope.launch {
             val userDocument = firestoreRepository.getUserByEmail(email)
             _userProfile.value = userDocument?.toObject(UserProfile::class.java)
@@ -115,8 +116,3 @@ class AuthViewModel(private val authRepository: AuthRepository, private val fire
         }
     }
 }
-
-data class UserProfile(
-    val email: String = "",
-    val name: String = ""
-)
