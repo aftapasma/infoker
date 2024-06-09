@@ -73,4 +73,8 @@ class UserProfileViewModel(
             }
         }
     }
+
+    suspend fun getUserPhotoUrl(email: String): String? {
+        return firestoreRepository.getPhotoUrl(email)
+    }
 }

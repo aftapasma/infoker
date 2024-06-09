@@ -84,6 +84,10 @@ fun Profile2(navController: NavHostController) {
 
     if (currentUser == null) {
         navController.navigate(Screen.Login.route)
+    } else {
+        LaunchedEffect(currentUser.email) {
+            userProfileViewModel.fetchUserProfile(currentUser.email ?: "")
+        }
     }
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
