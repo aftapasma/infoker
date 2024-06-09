@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,15 +36,19 @@ import org.d3if.infoker.navigation.Screen
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
 import org.d3if.infoker.ui.screen.component.CompanyBottomBar
+import org.d3if.infoker.ui.screen.perusahaan.tabs.ProfilViewModel
+import org.d3if.infoker.ui.screen.user.UserProfileViewModel
 import org.d3if.infoker.ui.screen.user.fetchUserProfileImage
 import org.d3if.infoker.ui.theme.InfokerTheme
 import org.d3if.infoker.util.AuthViewModelFactory
+import org.d3if.infoker.util.ViewModelFactory
 
 @Composable
 fun ProfilScreen(navController: NavHostController) {
     val authRepository = AuthRepository()
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
     val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(authRepository, firestoreRepository))
+    val CompanyProfileViewModel: ProfilViewModel = viewModel(factory = ViewModelFactory(authRepository, firestoreRepository))
 
     val userProfile = authViewModel.userProfile.observeAsState()
 
@@ -64,8 +69,8 @@ fun ProfilScreen(navController: NavHostController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 HeaderCompany(authViewModel, navController, userProfile.value)
-                BeforePersonalCompany()
-                PersonalCompany()
+//                BeforePersonalCompany()
+                PersonalCompany(CompanyProfileViewModel)
             }
         }
     )
@@ -142,7 +147,25 @@ fun HeaderCompany(authViewModel: AuthViewModel, navController: NavHostController
 }
 
 @Composable
-fun PersonalCompany() {
+fun PersonalCompany(profilViewModel: ProfilViewModel) {
+    val companyProfile by profilViewModel.userProfile.observeAsState()
+    var biodata by rememberSaveable { mutableStateOf(companyProfile?.biodata ?: "") }
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        BiodataDialog(
+            initialBiodata = companyProfile?.biodata ?: "",
+            onDismiss = { showDialog = false },
+            onSave = {
+                profilViewModel.saveBiodataCompany(it)
+                showDialog = false
+            }
+        )
+    }
+
+//    if (biodata.isEmpty()) {
+//        BeforePersonalUser(onAddBiodataClick = { showDialog = true })
+//    } else {
     Column {
         Row(
             modifier = Modifier
@@ -154,28 +177,20 @@ fun PersonalCompany() {
             Text(
                 text = "Deskripsi Perusahaan",
                 fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
+                fontSize = 16.sp
             )
-            IconButton(onClick = { /* Edit action */ }) {
+            IconButton(onClick = { showDialog = true }) {
                 Icon(
                     imageVector = Icons.Default.Edit,
-                    contentDescription = "Edit",
+                    contentDescription = "Edit Biodata",
+                    modifier = Modifier.size(24.dp)
                 )
             }
         }
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-//            backgroundColor = Color(0xFF1E1E1E)
-        ) {
-            Text(
-                text = "P",
-                color = Color.Gray,
-                modifier = Modifier.padding( 16.dp)
-            )
-        }
-
+        Text(
+            text = companyProfile?.biodata ?: "",
+            modifier = Modifier.padding(8.dp)
+        )
     }
 }
 
