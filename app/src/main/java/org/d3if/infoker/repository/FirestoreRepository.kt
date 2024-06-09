@@ -35,6 +35,20 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
         }
     }
 
+    suspend fun hasApplicationsForJob(jobId: String): Boolean {
+        return try {
+            val applicationsQuery = db.collection("applications")
+                .whereEqualTo("job.id", jobId)
+                .get()
+                .await()
+
+            applicationsQuery.documents.isNotEmpty()
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Error checking applications for job", e)
+            false
+        }
+    }
+
     suspend fun updateJob(
         id: String,
         title: String,
@@ -43,6 +57,11 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
         description: String
     ): Boolean {
         return try {
+            if (hasApplicationsForJob(id)) {
+                Log.d("FirestoreRepository", "Job cannot be updated because it has applications.")
+                return false
+            }
+
             val jobMap = hashMapOf(
                 "title" to title,
                 "location" to location,

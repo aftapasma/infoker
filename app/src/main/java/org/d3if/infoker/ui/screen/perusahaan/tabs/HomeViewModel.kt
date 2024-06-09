@@ -22,4 +22,12 @@ class HomeViewModel(private val authRepository: AuthRepository, private val fire
             }
         }
     }
+
+    fun hasApplicationsForJob(jobId: String): LiveData<Boolean> {
+        val result = MutableLiveData<Boolean>()
+        viewModelScope.launch {
+            result.value = firestoreRepository.hasApplicationsForJob(jobId)
+        }
+        return result
+    }
 }
