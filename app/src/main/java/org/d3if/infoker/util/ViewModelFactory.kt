@@ -45,9 +45,9 @@ class ViewModelFactory(
             modelClass.isAssignableFrom(ApplicantDetailViewModel::class.java) -> {
                 ApplicantDetailViewModel(firestoreRepository) as T
             }
-//            modelClass.isAssignableFrom(UserProfileViewModel::class.java) -> {
-//                UserProfileViewModel(authRepository, firestoreRepository) as T
-//            }
+            modelClass.isAssignableFrom(UserProfileViewModel::class.java) -> {
+                UserProfileViewModel(authRepository, firestoreRepository) as T
+            }
             else -> throw IllegalArgumentException("Unknown ViewModel Class")
         }
     }
