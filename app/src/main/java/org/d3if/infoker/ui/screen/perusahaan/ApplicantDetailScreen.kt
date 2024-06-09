@@ -3,7 +3,6 @@ package org.d3if.infoker.ui.screen.perusahaan
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -38,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -158,7 +156,6 @@ fun ApplicantDetailContent(
     modifier: Modifier = Modifier,
     viewModel: ApplicantDetailViewModel
 ) {
-    val context = LocalContext.current
     val userMap = applicant["user"] as? Map<String, Any> ?: emptyMap()
     val name = userMap["name"] as? String ?: "Unknown"
     val email = userMap["email"] as? String ?: "Unknown"
