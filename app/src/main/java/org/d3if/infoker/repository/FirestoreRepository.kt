@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.tasks.await
 
 class FirestoreRepository(private val db: FirebaseFirestore) {
@@ -501,5 +502,25 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
         } catch (e: Exception) {
             null
         }
+    }
+
+    fun saveProfileData(userEmail: String, profileData: Map<String, Any>) {
+        val userRef = db.collection("users").document(userEmail)
+        userRef.set(profileData, SetOptions.merge())
+    }
+
+    fun getProfileData(userEmail: String, onSuccess: (Map<String, Any>) -> Unit, onFailure: () -> Unit) {
+        val userRef = db.collection("users").document(userEmail)
+        userRef.get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    onSuccess(document.data ?: emptyMap())
+                } else {
+                    onFailure()
+                }
+            }
+            .addOnFailureListener {
+                onFailure()
+            }
     }
 }

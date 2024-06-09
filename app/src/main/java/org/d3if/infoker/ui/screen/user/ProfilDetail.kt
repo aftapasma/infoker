@@ -67,7 +67,6 @@ fun ProfileDetail(
 
     val context = LocalContext.current
     var name by remember { mutableStateOf(TextFieldValue("")) }
-    var email by remember { mutableStateOf(TextFieldValue("")) }
     var phone by remember { mutableStateOf(TextFieldValue("")) }
     var address by remember { mutableStateOf(TextFieldValue("")) }
     var showDialog by remember { mutableStateOf(false) }
@@ -75,9 +74,18 @@ fun ProfileDetail(
     val user = authRepository.getCurrentUser()
     val userEmail = user?.email ?: "default_user"
 
-    // Memuat URI gambar pengguna dari Firebase saat komponen dilakukan komposisi ulang
     LaunchedEffect(userEmail) {
         viewModel.fetchPhotoUrl()
+        viewModel.fetchProfileData(
+            onSuccess = {
+                name = TextFieldValue(viewModel.name ?: "")
+                phone = TextFieldValue(viewModel.phone ?: "")
+                address = TextFieldValue(viewModel.address ?: "")
+            },
+            onFailure = {
+                Toast.makeText(context, "Failed to load profile data", Toast.LENGTH_LONG).show()
+            }
+        )
     }
 
     val pickImageLauncher = rememberLauncherForActivityResult(
@@ -99,7 +107,18 @@ fun ProfileDetail(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Handle save action */ }) {
+                    IconButton(onClick = {
+                        viewModel.saveProfileData(
+                            name.text, phone.text, address.text,
+                            onSuccess = {
+                                Toast.makeText(context, "Profile data saved successfully", Toast.LENGTH_SHORT).show()
+                                navController.popBackStack()
+                            },
+                            onFailure = {
+                                Toast.makeText(context, "Failed to save profile data", Toast.LENGTH_LONG).show()
+                            }
+                        )
+                    }) {
                         Icon(imageVector = Icons.Default.Save, contentDescription = "Save")
                     }
                 }
@@ -121,7 +140,6 @@ fun ProfileDetail(
                         .clickable { pickImageLauncher.launch("image/*") },
                     contentAlignment = Alignment.Center
                 ) {
-                    // Menampilkan gambar profil pengguna dari URI yang diambil dari Firebase
                     viewModel.photoUrl?.let { uri ->
                         Image(
                             painter = rememberImagePainter(uri),
@@ -130,7 +148,6 @@ fun ProfileDetail(
                             modifier = Modifier.fillMaxSize()
                         )
                     } ?: run {
-                        // Placeholder atau gambar default jika URI tidak tersedia
                         Icon(
                             imageVector = Icons.Default.AccountCircle,
                             contentDescription = "Profile Picture",
@@ -146,15 +163,6 @@ fun ProfileDetail(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text("Nama Lengkap") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Email") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -201,6 +209,8 @@ fun ProfileDetail(
         }
     )
 }
+
+
 
 fun uploadImageToFirebase(
     viewModel: ProfileDetailViewModel,
