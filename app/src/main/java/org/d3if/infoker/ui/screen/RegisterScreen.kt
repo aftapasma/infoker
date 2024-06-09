@@ -2,6 +2,7 @@ package org.d3if.infoker.ui.screen
 
 
 import AuthViewModel
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -68,6 +70,8 @@ fun UserRegiterScreen(navController: NavHostController) {
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
     val authViewModel: AuthViewModel =
         viewModel(factory = AuthViewModelFactory(authRepository, firestoreRepository))
+
+    val context = LocalContext.current
 
     var name by rememberSaveable { mutableStateOf("") }
     var email by rememberSaveable { mutableStateOf("") }
@@ -183,19 +187,13 @@ fun UserRegiterScreen(navController: NavHostController) {
                     nameButton = "Buat Akun",
                     roundedCornerShape = RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp),
                     onClick = {
-                        if (inputCheck(name, email, password, password) && passwordCheck(
-                                password,
-                                passwordConfirm
-                            )
-                        )
-                            authViewModel.register(
-                            email,
-                            password,
-                            name,
-                                "user",
-                            navController
-                        )
-                        else return@GradientButton
+                        if (name.isEmpty() || email.isEmpty() || password.isEmpty() || passwordConfirm.isEmpty()) {
+                            Toast.makeText(context, "Semua bidang harus diisi", Toast.LENGTH_SHORT).show()
+                        } else if (password != passwordConfirm) {
+                            Toast.makeText(context, "Password tidak cocok", Toast.LENGTH_SHORT).show()
+                        } else {
+                            authViewModel.register(email, password, name, "user", navController)
+                        }
                     }
                 )
                 Spacer(modifier = Modifier.padding(10.dp))
@@ -232,6 +230,8 @@ fun CompanyRegiterScreen(navController: NavHostController) {
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
     val authViewModel: AuthViewModel =
         viewModel(factory = AuthViewModelFactory(authRepository, firestoreRepository))
+
+    val context = LocalContext.current
 
     var name by rememberSaveable { mutableStateOf("") }
     var email by rememberSaveable { mutableStateOf("") }
@@ -356,19 +356,13 @@ fun CompanyRegiterScreen(navController: NavHostController) {
                     nameButton = "Buat Akun",
                     roundedCornerShape = RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp),
                     onClick = {
-                        if (inputCheck(name, email, password, password) && passwordCheck(
-                                password,
-                                passwordConfirm
-                            )
-                        )
-                            authViewModel.register(
-                                email,
-                                password,
-                                name,
-                                "company",
-                                navController
-                            )
-                        else return@GradientButton
+                        if (name.isEmpty() || email.isEmpty() || password.isEmpty() || passwordConfirm.isEmpty()) {
+                            Toast.makeText(context, "Semua bidang harus diisi", Toast.LENGTH_SHORT).show()
+                        } else if (password != passwordConfirm) {
+                            Toast.makeText(context, "Password tidak cocok", Toast.LENGTH_SHORT).show()
+                        } else {
+                            authViewModel.register(email, password, name, "user", navController)
+                        }
                     }
                 )
                 Spacer(modifier = Modifier.padding(10.dp))
@@ -621,19 +615,6 @@ fun RegisterPasswordConfirm(passwordConfirm: String, onPasswordConfirmChange: (S
         },
         modifier = Modifier.fillMaxWidth(0.8f)
     )
-}
-
-private fun inputCheck(
-    name: String,
-    email: String,
-    password: String,
-    passwordConfirm: String
-): Boolean {
-    return name != "" && email != "" && password != "" && passwordConfirm != ""
-}
-
-private fun passwordCheck(password: String, passwordConfirm: String): Boolean {
-    return password == passwordConfirm
 }
 
 @Preview(showBackground = true)
