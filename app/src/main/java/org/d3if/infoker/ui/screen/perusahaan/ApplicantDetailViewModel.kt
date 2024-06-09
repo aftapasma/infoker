@@ -22,6 +22,9 @@ class ApplicantDetailViewModel(private val firestoreRepository: FirestoreReposit
     fun updateApplicationStatus(applicationId: String, status: String) {
         viewModelScope.launch {
             firestoreRepository.updateApplicationStatus(applicationId, status)
+            // Fetch the updated application details
+            val updatedApplication = firestoreRepository.getApplicationById(applicationId)
+            _applicantDetail.value = updatedApplication
         }
     }
 
