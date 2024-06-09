@@ -68,6 +68,8 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
     implementation(libs.androidx.runtime.livedata)
+    implementation("io.coil-kt:coil-compose:1.4.0")
+
 
     implementation(libs.androidx.material.icons.core)
     implementation(libs.androidx.foundation)

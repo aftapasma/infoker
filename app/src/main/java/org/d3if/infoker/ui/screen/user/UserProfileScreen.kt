@@ -3,14 +3,19 @@ package org.d3if.infoker.ui.screen.user
 import AuthViewModel
 import BiodataDialog
 import android.content.Context
+import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -45,7 +50,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -56,6 +63,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberImagePainter
 import com.google.firebase.firestore.FirebaseFirestore
 import org.d3if.infoker.R
 import org.d3if.infoker.navigation.Screen
@@ -116,6 +124,18 @@ fun Profile2(navController: NavHostController) {
 fun HeaderSection(authViewModel: AuthViewModel, navController: NavHostController) {
     val userProfile by authViewModel.userProfile.observeAsState()
 
+    var userProfileImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    LaunchedEffect(userProfile?.email) {
+        fetchUserProfileImage(userProfile?.email ?: "",
+            onSuccess = { uri ->
+                userProfileImageUri = uri
+            },
+            onFailure = {
+
+            }
+        )
+    }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -124,13 +144,30 @@ fun HeaderSection(authViewModel: AuthViewModel, navController: NavHostController
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = Icons.Default.AccountCircle,
-            contentDescription = "Profile Picture",
+        Box(
             modifier = Modifier
                 .size(64.dp)
-                .background(Color.Gray, shape = CircleShape)
-        )
+                .clip(CircleShape)
+                .background(Color.Gray)
+        ) {
+            // Menampilkan gambar profil pengguna dari URI yang diambil dari Firebase
+            userProfileImageUri?.let { uri ->
+                Image(
+                    painter = rememberImagePainter(uri),
+                    contentDescription = "Profile Picture",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } ?: run {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = "Profile Picture",
+                    modifier = Modifier.fillMaxSize(),
+                    tint = Color.White
+                )
+            }
+        }
+
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -153,6 +190,7 @@ fun HeaderSection(authViewModel: AuthViewModel, navController: NavHostController
         }
     }
 }
+
 
 @Composable
 fun Tab(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
