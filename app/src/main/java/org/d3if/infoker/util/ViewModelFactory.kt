@@ -12,8 +12,12 @@ import org.d3if.infoker.ui.screen.perusahaan.tabs.HomeViewModel
 import org.d3if.infoker.ui.screen.perusahaan.tabs.ListViewModel
 import org.d3if.infoker.ui.screen.user.JobDetailViewModel
 import org.d3if.infoker.ui.screen.user.JobListViewModel
+//import org.d3if.infoker.ui.screen.user.UserProfileViewModel
 
-class ViewModelFactory(private val authRepository: AuthRepository, private val firestoreRepository: FirestoreRepository) : ViewModelProvider.Factory {
+class ViewModelFactory(
+    private val authRepository: AuthRepository,
+    private val firestoreRepository: FirestoreRepository
+) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {
@@ -41,6 +45,9 @@ class ViewModelFactory(private val authRepository: AuthRepository, private val f
             modelClass.isAssignableFrom(ApplicantDetailViewModel::class.java) -> {
                 ApplicantDetailViewModel(firestoreRepository) as T
             }
+//            modelClass.isAssignableFrom(UserProfileViewModel::class.java) -> {
+//                UserProfileViewModel(authRepository, firestoreRepository) as T
+//            }
             else -> throw IllegalArgumentException("Unknown ViewModel Class")
         }
     }

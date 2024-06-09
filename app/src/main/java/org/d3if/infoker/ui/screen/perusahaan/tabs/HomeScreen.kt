@@ -141,18 +141,18 @@ fun ScreenContent(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(jobs) { job ->
-            ListItem(job, navController)
+            ListItem(homeViewModel, job, navController)
         }
     }
 }
 
 @Composable
-fun ListItem(job: DocumentSnapshot, navController: NavHostController) {
+fun ListItem(homeViewModel: HomeViewModel, job: DocumentSnapshot, navController: NavHostController) {
     val title = job.getString("title")
     val location = job.getString("location")
     val date = job.getDate("createdAt") ?: Date()
-
     val formattedDate = DateFormat.getDateInstance().format(date)
+    val hasApplications by homeViewModel.hasApplicationsForJob(job.id).observeAsState(initial = false)
 
     Card(
         modifier = Modifier
@@ -172,12 +172,16 @@ fun ListItem(job: DocumentSnapshot, navController: NavHostController) {
                 Text(text = location ?: "Unknown", style = MaterialTheme.typography.titleMedium)
                 Text(text = formattedDate, style = MaterialTheme.typography.bodyMedium)
             }
-            IconButton(onClick = { navController.navigate(Screen.EditJob.withId(job.id)) }) {
+            IconButton(
+                onClick = { if (!hasApplications) navController.navigate(Screen.EditJob.withId(job.id)) },
+                enabled = !hasApplications
+            ) {
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = "Edit"
                 )
             }
+
         }
     }
 }

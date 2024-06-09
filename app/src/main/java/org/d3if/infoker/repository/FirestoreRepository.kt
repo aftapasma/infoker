@@ -35,6 +35,20 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
         }
     }
 
+    suspend fun hasApplicationsForJob(jobId: String): Boolean {
+        return try {
+            val applicationsQuery = db.collection("applications")
+                .whereEqualTo("job.id", jobId)
+                .get()
+                .await()
+
+            applicationsQuery.documents.isNotEmpty()
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Error checking applications for job", e)
+            false
+        }
+    }
+
     suspend fun updateJob(
         id: String,
         title: String,
@@ -43,6 +57,11 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
         description: String
     ): Boolean {
         return try {
+            if (hasApplicationsForJob(id)) {
+                Log.d("FirestoreRepository", "Job cannot be updated because it has applications.")
+                return false
+            }
+
             val jobMap = hashMapOf(
                 "title" to title,
                 "location" to location,
@@ -418,6 +437,39 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
             true
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "Error updating application status", e)
+            false
+        }
+    }
+
+    suspend fun saveBiodataByEmail(email: String, biodata: String): Boolean {
+        return try {
+            val userSnapshot = getUserByEmail(email)
+            if (userSnapshot != null) {
+                val userRef = userSnapshot.reference
+                userRef.update("biodata", biodata).await()
+                true
+            } else {
+                Log.d("FirestoreRepository", "User with email $email not found.")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Error saving biodata", e)
+            false
+        }
+    }
+
+    suspend fun deleteMarkedApplications(applicationIds: List<String>): Boolean {
+        return try {
+            val batch = db.batch()
+            applicationIds.forEach { id ->
+                val docRef = db.collection("applications").document(id)
+                batch.delete(docRef)
+            }
+            batch.commit().await()
+            Log.d("FirestoreRepository", "Marked applications deleted successfully.")
+            true
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Error deleting marked applications", e)
             false
         }
     }

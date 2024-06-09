@@ -14,4 +14,9 @@ class ListViewModel(private val firestoreRepository: FirestoreRepository) : View
         val rejectedApplications = firestoreRepository.getRejectedApplicationsByCompany(email)
         emit(rejectedApplications)
     }
+
+    fun deleteMarkedApplications(applicationIds: List<String>) = liveData {
+        val result = firestoreRepository.deleteMarkedApplications(applicationIds)
+        emit(result)
+    }
 }
