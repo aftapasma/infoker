@@ -26,8 +26,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -35,6 +40,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.compose.rememberImagePainter
+import coil.transform.CircleCropTransformation
 import com.google.firebase.firestore.FirebaseFirestore
 import org.d3if.infoker.R
 import org.d3if.infoker.navigation.Screen
@@ -135,9 +142,11 @@ fun JobDetailScreen(navController: NavHostController, id: String?) {
                 JobDetail(
                     title = job.getString("title") ?: "",
                     company = job.getString("createdBy.name") ?: "Unknown Company",
+                    email = job.getString("createdBy.email") ?: "",
                     location = job.getString("location") ?: "",
                     salary = job.getDouble("salary")?.toFloat() ?: 0.0f,
                     description = job.getString("description") ?: "",
+                    jobDetailViewModel = jobDetailViewModel,
                     modifier = Modifier.padding(top = 70.dp)
                 )
             } ?: run {
@@ -155,26 +164,49 @@ fun JobDetailScreen(navController: NavHostController, id: String?) {
 fun JobDetail(
     title: String,
     company: String,
+    email: String,
     location: String,
     salary: Float,
     description: String,
+    jobDetailViewModel: JobDetailViewModel,
     modifier: Modifier
 ) {
     Surface(
         color = MaterialTheme.colorScheme.background,
         modifier = modifier.fillMaxSize()
     ) {
+        var photoProfileUrl by remember { mutableStateOf<String?>(null) }
+        val scope = rememberCoroutineScope()
+
+        LaunchedEffect(email) {
+            photoProfileUrl = jobDetailViewModel.getUserPhotoUrl(email)
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                imageVector = Icons.Default.AccountCircle,
-                contentDescription = "Logo Perusahaan",
-                modifier = Modifier.size(100.dp)
-            )
+            if (photoProfileUrl != null) {
+                Image(
+                    painter = rememberImagePainter(
+                        data = photoProfileUrl,
+                        builder = {
+                            transformations(CircleCropTransformation())
+                        }
+                    ),
+                    contentDescription = "Company Logo",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(100.dp)
+                )
+            } else {
+                Image(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = "Company Logo",
+                    modifier = Modifier.size(100.dp)
+                )
+            }
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
@@ -207,35 +239,21 @@ fun JobDetail(
                 style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-//            Text(
-//                text = "Requirements:",
-//                style = MaterialTheme.typography.titleMedium,
-//                fontWeight = FontWeight.Bold,
-//                modifier = Modifier.padding(bottom = 8.dp)
-//            )
-//            LazyColumn {
-//                items(jobDetail.requirements) { requirement ->
-//                    Text(
-//                        text = "• $requirement",
-//                        style = MaterialTheme.typography.titleLarge,
-//                        fontSize = 16.sp,
-//                        modifier = Modifier.padding(bottom = 8.dp)
-//                    )
-//                }
-//            }
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewJobDetailScreen() {
-    JobDetail(
-        title = "Budak Hitam",
-        company = "Afta Tunas Jaya Abadi Tbk.",
-        location = "Merangin, Jambi",
-        salary = 0f,
-        description = "Dicari orang-orang hitam.",
-        modifier = Modifier
-    )
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewJobDetailScreen() {
+//    JobDetail(
+//        title = "Budak Hitam",
+//        company = "Afta Tunas Jaya Abadi Tbk.",
+//        email = "example@example.com",
+//        location = "Merangin, Jambi",
+//        salary = 0f,
+//        description = "Dicari orang-orang hitam.",
+//        jobDetailViewModel = jobDetailViewModel,
+//        modifier = Modifier
+//    )
+//}

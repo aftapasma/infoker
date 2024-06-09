@@ -75,4 +75,8 @@ class JobDetailViewModel(private val authRepository: AuthRepository, private val
             }
         }
     }
+
+    suspend fun getUserPhotoUrl(email: String): String? {
+        return firestoreRepository.getPhotoUrl(email)
+    }
 }
