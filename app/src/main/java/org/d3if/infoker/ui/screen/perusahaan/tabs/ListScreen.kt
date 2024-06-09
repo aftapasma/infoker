@@ -1,11 +1,12 @@
 package org.d3if.infoker.ui.screen.perusahaan.tabs
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -62,6 +63,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@SuppressLint("MutableCollectionMutableState")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListScreen(navController: NavHostController) {
@@ -71,6 +73,10 @@ fun ListScreen(navController: NavHostController) {
 
     val currentUser = authRepository.getCurrentUser()
     val userEmail = currentUser?.email ?: ""
+
+    var refreshTrigger by remember { mutableStateOf(false) }
+    val checkboxStates by remember { mutableStateOf(mutableMapOf<String, Boolean>()) }
+    var selectedApplicationIds by remember { mutableStateOf(listOf<String>()) }
 
     val acceptedApplications by listViewModel.getAcceptedApplicationsByCompany(userEmail).observeAsState(initial = emptyList())
     val rejectedApplications by listViewModel.getRejectedApplicationsByCompany(userEmail).observeAsState(initial = emptyList())
@@ -85,7 +91,7 @@ fun ListScreen(navController: NavHostController) {
         topBar = {
             TopAppBar(
                 title = {
-                    Text(stringResource(R.string.app_name))
+                    Text("Daftar Pelamar")
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -98,6 +104,15 @@ fun ListScreen(navController: NavHostController) {
                 navController = navController,
                 acceptedApplications = acceptedApplications,
                 rejectedApplications = rejectedApplications,
+                onApplicationSelected = { applicationId, isSelected ->
+                    selectedApplicationIds = if (isSelected) {
+                        selectedApplicationIds + applicationId
+                    } else {
+                        selectedApplicationIds - applicationId
+                    }
+                    checkboxStates[applicationId] = isSelected
+                },
+                checkboxStates = checkboxStates,
                 modifier = Modifier.padding(paddingValues)
             )
         },
@@ -125,7 +140,13 @@ fun ListScreen(navController: NavHostController) {
             confirmButton = {
                 Button(
                     onClick = {
-                        // Lakukan tindakan penghapusan data di sini
+                        listViewModel.deleteMarkedApplications(selectedApplicationIds)
+                            .observeForever { success ->
+                                if (success) {
+                                    refreshTrigger = !refreshTrigger
+                                    checkboxStates.clear()
+                                }
+                            }
                         showDialog = false
                     }) {
                     Text("Hapus")
@@ -139,6 +160,11 @@ fun ListScreen(navController: NavHostController) {
             }
         )
     }
+
+    LaunchedEffect(refreshTrigger) {
+        listViewModel.getAcceptedApplicationsByCompany(userEmail)
+        listViewModel.getRejectedApplicationsByCompany(userEmail)
+    }
 }
 
 @Composable
@@ -146,6 +172,8 @@ fun ApplicantDetailList(
     navController: NavHostController,
     acceptedApplications: List<DocumentSnapshot>,
     rejectedApplications: List<DocumentSnapshot>,
+    onApplicationSelected: (String, Boolean) -> Unit,
+    checkboxStates: Map<String, Boolean>,
     modifier: Modifier = Modifier
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
@@ -193,39 +221,59 @@ fun ApplicantDetailList(
                 .weight(1f)
         ) {
             when (selectedTabIndex) {
-                0 -> ApplicantList(navController, acceptedApplications)
-                1 -> ApplicantList(navController, rejectedApplications)
+                0 -> ApplicantList(
+                    navController,
+                    acceptedApplications,
+                    onApplicationSelected,
+                    checkboxStates
+                )
+                1 -> ApplicantList(
+                    navController,
+                    rejectedApplications,
+                    onApplicationSelected,
+                    checkboxStates
+                )
             }
         }
     }
 }
 
 @Composable
-fun ApplicantList(navController: NavHostController, applications: List<DocumentSnapshot>) {
-    LazyColumn {
+fun ApplicantList(
+    navController: NavHostController,
+    applications: List<DocumentSnapshot>,
+    onApplicationSelected: (String, Boolean) -> Unit,
+    checkboxStates: Map<String, Boolean>
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = 84.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         if (applications.isEmpty()) {
             item {
-                Text("No applications found.")
+                Text("Tidak ada Pelamar")
             }
         } else {
             items(applications) { document ->
                 val userMap = document["user"] as? Map<String, Any> ?: emptyMap()
                 val jobMap = document["job"] as? Map<String, Any> ?: emptyMap()
-                val name = userMap["name"] as? String ?: "N/A"
-                val jobTitle = jobMap["title"] as? String ?: "N/A"
-                val company = jobMap["createdBy.name"] as? String ?: "N/A"
-                val location = jobMap["location"] as? String ?: "N/A"
+                val name = userMap["name"] as? String ?: "Nama Kosong"
+                val jobTitle = jobMap["title"] as? String ?: "Pekerjaan kosong"
+                val location = jobMap["location"] as? String ?: "lokasi kosong"
                 val salary = jobMap["salary"] as? Double ?: 0.0
                 val createdAt = (document["createdAt"] as? com.google.firebase.Timestamp)?.toDate() ?: Date()
 
                 JobApplicationItem(
+                    applicationId = document.id,
                     name = name,
                     jobTitle = jobTitle,
-                    company = company,
                     location = location,
                     salary = salary,
                     createdAt = createdAt,
-                    onClick = {  }
+                    onClick = { /* Handle click */ },
+                    onCheckedChange = onApplicationSelected,
+                    isChecked = checkboxStates[document.id] ?: false
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -235,24 +283,25 @@ fun ApplicantList(navController: NavHostController, applications: List<DocumentS
 
 @Composable
 fun JobApplicationItem(
+    applicationId: String,
     name: String,
     jobTitle: String,
-    company: String,
     location: String,
     salary: Double,
     createdAt: Date,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onCheckedChange: (String, Boolean) -> Unit,
+    isChecked: Boolean
 ) {
     val formattedDate = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(createdAt)
     var checked by remember {
-        mutableStateOf(false)
+        mutableStateOf(isChecked)
     }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .border(1.dp, Color.Black, RoundedCornerShape(16.dp))
+            .padding( 8.dp)
             .clickable(onClick = onClick)
     ) {
         Row(
@@ -267,14 +316,16 @@ fun JobApplicationItem(
                     text = jobTitle,
                     style = MaterialTheme.typography.titleMedium,
                 )
-                Text(text = company, style = MaterialTheme.typography.titleMedium)
                 Text(text = location, style = MaterialTheme.typography.titleSmall)
                 Text(text = stringResource(id = R.string.salary_format, salary), style = MaterialTheme.typography.titleSmall)
                 Text(text = formattedDate, style = MaterialTheme.typography.titleSmall)
             }
             Checkbox(
                 checked = checked,
-                onCheckedChange = {checked = it},
+                onCheckedChange = {
+                    checked = it
+                    onCheckedChange(applicationId, it)
+                                  },
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
                     .padding(end = 16.dp)

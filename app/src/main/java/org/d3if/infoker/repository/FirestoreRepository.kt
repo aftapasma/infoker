@@ -457,4 +457,20 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
             false
         }
     }
+
+    suspend fun deleteMarkedApplications(applicationIds: List<String>): Boolean {
+        return try {
+            val batch = db.batch()
+            applicationIds.forEach { id ->
+                val docRef = db.collection("applications").document(id)
+                batch.delete(docRef)
+            }
+            batch.commit().await()
+            Log.d("FirestoreRepository", "Marked applications deleted successfully.")
+            true
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Error deleting marked applications", e)
+            false
+        }
+    }
 }
