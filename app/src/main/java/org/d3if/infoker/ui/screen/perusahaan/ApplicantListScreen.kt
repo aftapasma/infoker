@@ -107,11 +107,25 @@ fun ApplicantList(
     onClick: (DocumentSnapshot) -> Unit,
     viewModel: ApplicantListViewModel
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize()
-    ) {
-        items(applicants) { applicant ->
-            ApplicantDetailContent(applicant = applicant, onClick = { onClick(applicant) }, viewModel = viewModel)
+    if (applicants.isEmpty()) {
+        Column(
+            modifier = modifier.fillMaxSize().padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "Belum ada pelamar")
+        }
+    } else {
+        LazyColumn(
+            modifier = modifier.fillMaxSize()
+        ) {
+            items(applicants) { applicant ->
+                ApplicantDetailContent(
+                    applicant = applicant,
+                    onClick = { onClick(applicant) },
+                    viewModel = viewModel
+                )
+            }
         }
     }
 }

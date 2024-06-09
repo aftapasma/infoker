@@ -175,13 +175,6 @@ fun ApplicantDetailContent(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            imageVector = Icons.Default.AccountCircle,
-            contentDescription = "Foto pelamar",
-            modifier = Modifier
-                .size(100.dp)
-                .padding(16.dp)
-        )
         Box(
             modifier = Modifier
                 .size(100.dp)

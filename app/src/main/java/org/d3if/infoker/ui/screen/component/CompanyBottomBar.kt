@@ -33,7 +33,7 @@ fun CompanyBottomBar(navController: NavHostController) {
                 alwaysShowLabel = true,
                 label = { Text(text = "home") },
                 icon = { Icon(imageVector = Icons.Default.Home, contentDescription = "home") },
-                selected = selectedItem == 0,
+                selected = false,
                 onClick = {
                     selectedItem = 0
                     navController.navigate(Screen.Home.route) {
@@ -49,9 +49,8 @@ fun CompanyBottomBar(navController: NavHostController) {
             alwaysShowLabel = true,
             icon = { Icon(imageVector = Icons.AutoMirrored.Filled.List, contentDescription = "list")},
             label = { Text(text = "list") },
-            selected = selectedItem == 1,
+            selected = false,
             onClick = {
-                selectedItem = 1
                 navController.navigate(Screen.List.route) {
                     navController.graph.startDestinationRoute?.let { route ->
                         popUpTo(route) { saveState = true }
@@ -65,7 +64,7 @@ fun CompanyBottomBar(navController: NavHostController) {
             alwaysShowLabel = true,
             icon = { Icon(imageVector = Icons.Default.Person, contentDescription = "profile") },
             label = { Text(text = "profile") },
-            selected = selectedItem == 2,
+            selected = false,
             onClick = {
                 selectedItem = 2
                 navController.navigate(Screen.CompanyProfile.route) {
