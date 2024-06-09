@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -133,7 +134,7 @@ fun JobDetailScreen(navController: NavHostController, id: String?) {
             jobDetail?.let { job ->
                 JobDetail(
                     title = job.getString("title") ?: "",
-                    company = "Afta Tunas Jaya Abadi Barokah Tbk.",
+                    company = job.getString("createdBy.name") ?: "Unknown Company",
                     location = job.getString("location") ?: "",
                     salary = job.getDouble("salary")?.toFloat() ?: 0.0f,
                     description = job.getString("description") ?: "",
@@ -142,7 +143,7 @@ fun JobDetailScreen(navController: NavHostController, id: String?) {
             } ?: run {
                 // Handle case where job is null (e.g., show a loading indicator or an error message)
                 Text(
-                    text = "Job Not Found",
+                    text = "Pekerjaan tidak ditemukan",
                     modifier = Modifier.padding(16.dp)
                 )
             }
@@ -170,7 +171,7 @@ fun JobDetail(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.drawable.baseline_android_24),
+                imageVector = Icons.Default.AccountCircle,
                 contentDescription = "Logo Perusahaan",
                 modifier = Modifier.size(100.dp)
             )

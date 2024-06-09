@@ -5,6 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -74,7 +76,7 @@ fun ActivityScreen(navController: NavHostController) {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        "Daftar Pekerjaan",
+                        "Daftar Simpan",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -158,7 +160,14 @@ fun SavedApplicationsList(navController: NavHostController, viewModel: ActivityV
     LazyColumn {
         if (bookmarks.isEmpty()) {
             item {
-                Text("No bookmarks found.")
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(16.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("Tidak ada Pekerjaan Yang disimpan")
+                }
+
             }
         } else {
             items(bookmarks) { document ->
@@ -192,7 +201,13 @@ fun AppliedApplicationsList(navController: NavHostController, viewModel: Activit
     LazyColumn {
         if (applications.isEmpty()) {
             item {
-                Text("No applications found.")
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(16.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("Tidak ada Pekerjaan Yang dilamar")
+                }
             }
         } else {
             items(applications) { document ->
