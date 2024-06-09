@@ -35,6 +35,30 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
         }
     }
 
+    suspend fun updateJob(
+        id: String,
+        title: String,
+        location: String,
+        salary: Float,
+        description: String
+    ): Boolean {
+        return try {
+            val jobMap = hashMapOf(
+                "title" to title,
+                "location" to location,
+                "salary" to salary,
+                "description" to description,
+                "updatedAt" to FieldValue.serverTimestamp()
+            )
+
+            db.collection("jobs").document(id).update(jobMap as Map<String, Any>).await()
+            Log.d("FirestoreRepository", "Job updated in Firestore.")
+            true
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Error updating job", e)
+            false
+        }
+    }
 
     suspend fun getAllJobs(): List<DocumentSnapshot> {
         return try {

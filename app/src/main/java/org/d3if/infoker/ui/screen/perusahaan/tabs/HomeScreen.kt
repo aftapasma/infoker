@@ -58,7 +58,8 @@ import java.util.Date
 fun HomeScreen(navController: NavHostController) {
     val authRepository = AuthRepository()
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
-    val homeViewModel: HomeViewModel = viewModel(factory = ViewModelFactory(authRepository, firestoreRepository))
+    val homeViewModel: HomeViewModel =
+        viewModel(factory = ViewModelFactory(authRepository, firestoreRepository))
 
     LaunchedEffect(Unit) {
         homeViewModel.getJobs()
@@ -98,12 +99,15 @@ fun HomeScreen(navController: NavHostController) {
         }
     ) { padding ->
         ScreenContent(homeViewModel, navController, Modifier.padding(padding))
-        }
-
+    }
 }
 
 @Composable
-fun ScreenContent(homeViewModel: HomeViewModel, navController: NavHostController, modifier: Modifier){
+fun ScreenContent(
+    homeViewModel: HomeViewModel,
+    navController: NavHostController,
+    modifier: Modifier
+) {
     val jobs by homeViewModel.companyJobs.observeAsState(initial = emptyList())
 
     LazyColumn(
@@ -143,7 +147,7 @@ fun ListItem(job: DocumentSnapshot, navController: NavHostController) {
                 Text(text = location ?: "Unknown", style = MaterialTheme.typography.titleMedium)
                 Text(text = formattedDate, style = MaterialTheme.typography.bodyMedium)
             }
-            IconButton(onClick = { /* Handle edit */ }) {
+            IconButton(onClick = { navController.navigate(Screen.EditJob.withId(job.id)) }) {
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = "Edit"

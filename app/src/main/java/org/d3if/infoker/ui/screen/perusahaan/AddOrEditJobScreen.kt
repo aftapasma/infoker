@@ -12,10 +12,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -27,59 +24,43 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.firestore.FirebaseFirestore
-import org.d3if.infoker.repository.FirestoreRepository
 import org.d3if.infoker.R
-import org.d3if.infoker.navigation.Screen
 import org.d3if.infoker.repository.AuthRepository
+import org.d3if.infoker.repository.FirestoreRepository
 import org.d3if.infoker.ui.theme.InfokerTheme
 import org.d3if.infoker.util.ViewModelFactory
 
+const val KEY_EDITJOB_ID = "editJobId"
+
 @Composable
-fun AddJobScreen(navController: NavHostController) {
+fun AddOrEditJobScreen(navController: NavHostController, jobId: String? = null) {
     val authRepository = AuthRepository()
     val firestoreRepository = FirestoreRepository(FirebaseFirestore.getInstance())
 
-    val addJobViewModel: AddJobViewModel =
+    val addJobViewModel: AddOrEditJobViewModel =
         viewModel(factory = ViewModelFactory(authRepository, firestoreRepository))
 
-
-
-    var title by remember {
-        mutableStateOf("")
-    }
-
-    var location by remember {
-        mutableStateOf("")
-    }
-
-    var salary by remember {
-        mutableStateOf("")
-    }
-
-    var description by remember {
-        mutableStateOf("")
-    }
-
-    val currentUser = authRepository.getCurrentUser()
-
-    if (currentUser == null) {
-        navController.navigate(Screen.Login.route)
+    if (jobId != null) {
+        LaunchedEffect(jobId) {
+            addJobViewModel.loadJobDetails(jobId)
+        }
     }
 
     Scaffold { padding ->
         ScreenContent(
-            navController = navController,
-            title = title,
-            onTitleChange = { title = it },
-            location = location,
-            onLocationChange = { location = it },
-            salary = salary,
-            onSalaryChange = { salary = it },
-            description = description,
-            onDescriptionChange = { description = it },
+            title = addJobViewModel.title,
+            onTitleChange = { addJobViewModel.title = it },
+            location = addJobViewModel.location,
+            onLocationChange = { addJobViewModel.location = it },
+            salary = addJobViewModel.salary,
+            onSalaryChange = { addJobViewModel.salary = it },
+            description = addJobViewModel.description,
+            onDescriptionChange = { addJobViewModel.description = it },
             onAddJobClick = {
-                addJobViewModel.addJob(title, location, salary.toFloat(), description)
+                addJobViewModel.addOrEditJob(jobId)
+                navController.popBackStack()
             },
+            isEditMode = addJobViewModel.isEditMode,
             modifier = Modifier.padding(padding)
         )
     }
@@ -87,7 +68,6 @@ fun AddJobScreen(navController: NavHostController) {
 
 @Composable
 fun ScreenContent(
-    navController: NavHostController,
     title: String,
     onTitleChange: (String) -> Unit,
     location: String,
@@ -97,6 +77,7 @@ fun ScreenContent(
     description: String,
     onDescriptionChange: (String) -> Unit,
     onAddJobClick: () -> Unit,
+    isEditMode: Boolean,
     modifier: Modifier
 ) {
     Column(
@@ -144,18 +125,17 @@ fun ScreenContent(
             label = { Text(text = stringResource(id = R.string.description)) },
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences,
-                imeAction = ImeAction.Next
+                imeAction = ImeAction.Done
             ),
             modifier = modifier.fillMaxWidth()
         )
         Button(
             onClick = {
                 onAddJobClick()
-                navController.popBackStack()
                       },
             modifier = modifier.fillMaxWidth()
         ) {
-            Text(text = stringResource(id = R.string.add))
+            Text(text = if (isEditMode) stringResource(id = R.string.edit) else stringResource(id = R.string.add))
         }
     }
 }
@@ -163,8 +143,8 @@ fun ScreenContent(
 @Preview(showBackground = true)
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun JobDetailScreenPreview() {
+fun AddOrEditJobScreenPreview() {
     InfokerTheme {
-        AddJobScreen(rememberNavController())
+        AddOrEditJobScreen(rememberNavController())
     }
 }

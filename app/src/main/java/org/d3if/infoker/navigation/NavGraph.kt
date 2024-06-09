@@ -20,11 +20,12 @@ import org.d3if.infoker.ui.screen.CompanyRegiterScreen
 import org.d3if.infoker.ui.screen.LoginScreen
 import org.d3if.infoker.ui.screen.UserRegiterScreen
 import org.d3if.infoker.ui.screen.component.LoadingScreen
-import org.d3if.infoker.ui.screen.perusahaan.AddJobScreen
+import org.d3if.infoker.ui.screen.perusahaan.AddOrEditJobScreen
 import org.d3if.infoker.ui.screen.perusahaan.ApplicantDetailScreen
 import org.d3if.infoker.ui.screen.perusahaan.ApplicantListScreen
 import org.d3if.infoker.ui.screen.perusahaan.KEY_APPLICANT_ID
 import org.d3if.infoker.ui.screen.perusahaan.KEY_COMPANYJOB_ID
+import org.d3if.infoker.ui.screen.perusahaan.KEY_EDITJOB_ID
 import org.d3if.infoker.ui.screen.perusahaan.tabs.HomeScreen
 import org.d3if.infoker.ui.screen.perusahaan.tabs.ListScreen
 import org.d3if.infoker.ui.screen.user.ActivityScreen
@@ -69,7 +70,14 @@ fun SetUpNavGraph(navController: NavHostController = rememberNavController()) {
                 LoginScreen(navController)
             }
             composable(route = Screen.AddJob.route) {
-                AddJobScreen(navController)
+                AddOrEditJobScreen(navController)
+            }
+            composable(route = Screen.EditJob.route, arguments = listOf(
+                navArgument(KEY_EDITJOB_ID) { type = NavType.StringType }
+            )
+            ) { navBackStackEntry ->
+                val id = navBackStackEntry.arguments?.getString(KEY_EDITJOB_ID)
+                AddOrEditJobScreen(navController, id)
             }
             composable(route = Screen.JobList.route) {
                 JobListScreen(navController)
