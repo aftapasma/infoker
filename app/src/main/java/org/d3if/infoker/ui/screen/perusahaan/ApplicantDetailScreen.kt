@@ -5,14 +5,22 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -20,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -28,7 +35,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import org.d3if.infoker.R
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
 import org.d3if.infoker.util.ViewModelFactory
@@ -37,6 +43,7 @@ import java.util.Date
 
 const val KEY_APPLICANT_ID = "applicantId"
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ApplicantDetailScreen(navController: NavHostController, applicantId: String?) {
@@ -54,13 +61,35 @@ fun ApplicantDetailScreen(navController: NavHostController, applicantId: String?
     val applicantDetail by applicantDetailViewModel.applicantDetail.collectAsState()
 
     Scaffold(
-        content = {
+        topBar = {
+            TopAppBar(
+                title = { Text("Detail Pelamar") },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navController.popBackStack()
+                    }) {
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        },
+        content = {paddingValues ->
             applicantDetail?.let { applicant ->
                 ApplicantDetailContent(
-                    applicant = applicant
+                    applicant = applicant,
+                    modifier = Modifier.padding(paddingValues)
                 )
             } ?: run {
-                Text(text = "Loading...", modifier = Modifier.padding(16.dp))
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(16.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Sedang Memuat...",
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
         },
         bottomBar = {
@@ -107,7 +136,8 @@ fun ApplicantDetailScreen(navController: NavHostController, applicantId: String?
 
 @Composable
 fun ApplicantDetailContent(
-    applicant: DocumentSnapshot
+    applicant: DocumentSnapshot,
+    modifier: Modifier = Modifier
 ) {
     val userMap = applicant["user"] as? Map<String, Any> ?: emptyMap()
     val name = userMap["name"] as? String ?: "Unknown"
@@ -115,15 +145,15 @@ fun ApplicantDetailContent(
     val createdAt = (applicant["createdAt"] as? com.google.firebase.Timestamp)?.toDate() ?: Date()
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.baseline_android_24),
+            imageVector = Icons.Default.AccountCircle,
             contentDescription = "Foto pelamar",
-            modifier = Modifier.size(100.dp)
+            modifier = Modifier.size(100.dp).padding(16.dp)
         )
         Text(text = "Name: $name", color = Color.Black, style = MaterialTheme.typography.titleLarge)
         Text(

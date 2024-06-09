@@ -3,10 +3,8 @@ package org.d3if.infoker.ui.screen.perusahaan
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,18 +13,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -34,7 +37,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import org.d3if.infoker.R
 import org.d3if.infoker.navigation.Screen
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
@@ -45,6 +47,7 @@ import java.util.Date
 
 const val KEY_COMPANYJOB_ID = "jobId"
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ApplicantListScreen(navController: NavHostController, jobId: String?) {
@@ -61,10 +64,26 @@ fun ApplicantListScreen(navController: NavHostController, jobId: String?) {
     val applicants by applicantListViewModel.applicants.collectAsState()
 
     Scaffold(
-        content = {
-            ApplicantList(applicants = applicants, onClick = { applicant ->
+        topBar = {
+            TopAppBar(
+                title = { Text("Daftar Pelamar") },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navController.popBackStack()
+                    }) {
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        },
+        content = {paddingValues ->
+            ApplicantList(
+                applicants = applicants,
+                onClick = { applicant ->
                 navController.navigate(Screen.ApplicantDetail.withId(applicant.id))
-            })
+            },
+                modifier = Modifier.padding(paddingValues)
+            )
         }
     )
 }
@@ -93,11 +112,11 @@ fun ApplicantDetailContent(applicant: DocumentSnapshot, onClick: () -> Unit) {
 
     val formattedDate = DateFormat.getDateInstance().format(createdAt)
 
-    Box(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .border(1.dp, Color.Black, RoundedCornerShape(16.dp))
+//            .border(1.dp, Color.Black, RoundedCornerShape(16.dp))
             .clickable(onClick = onClick)
     ) {
         Row(
@@ -108,7 +127,7 @@ fun ApplicantDetailContent(applicant: DocumentSnapshot, onClick: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Image(
-                painter = painterResource(id = R.drawable.baseline_android_24),
+                imageVector = Icons.Default.AccountCircle,
                 contentDescription = "Company Logo",
                 modifier = Modifier
                     .size(48.dp)

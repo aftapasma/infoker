@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -26,12 +27,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -71,11 +75,13 @@ fun HomeScreen(navController: NavHostController) {
         activity?.finish()
     }
 
+    val searchText = remember { mutableStateOf("") }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("")
+                    Text("Daftar Lowongan")
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -98,21 +104,40 @@ fun HomeScreen(navController: NavHostController) {
             CompanyBottomBar(navController = navController)
         }
     ) { padding ->
-        ScreenContent(homeViewModel, navController, Modifier.padding(padding))
+        Column(modifier = Modifier.padding(padding)) {
+
+        SearchBar(searchText.value) {
+            searchText.value = it
+        }
+        ScreenContent(homeViewModel, navController)
+        }
     }
+}
+
+@Composable
+fun SearchBar(searchText: String, onSearchTextChange: (String) -> Unit) {
+    TextField(
+        value = searchText,
+        onValueChange = onSearchTextChange,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        placeholder = { Text("Cari pekerjaan...") },
+        leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = "Search") }
+    )
 }
 
 @Composable
 fun ScreenContent(
     homeViewModel: HomeViewModel,
     navController: NavHostController,
-    modifier: Modifier
+//    modifier: Modifier
 ) {
     val jobs by homeViewModel.companyJobs.observeAsState(initial = emptyList())
 
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = 84.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(jobs) { job ->
@@ -134,7 +159,7 @@ fun ListItem(job: DocumentSnapshot, navController: NavHostController) {
             .fillMaxWidth()
             .clickable { navController.navigate(Screen.ApplicantList.withId(job.id)) }
             .padding(8.dp)
-            .border(1.dp, Color.Black, RoundedCornerShape(16.dp))
+//            .border(1.dp, Color.Black, RoundedCornerShape(16.dp))
     ) {
         Row(
             modifier = Modifier

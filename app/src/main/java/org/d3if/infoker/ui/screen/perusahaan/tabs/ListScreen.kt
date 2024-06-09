@@ -2,10 +2,10 @@ package org.d3if.infoker.ui.screen.perusahaan.tabs
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -57,6 +57,7 @@ import org.d3if.infoker.R
 import org.d3if.infoker.navigation.Screen
 import org.d3if.infoker.repository.AuthRepository
 import org.d3if.infoker.repository.FirestoreRepository
+import org.d3if.infoker.ui.screen.component.CompanyBottomBar
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -84,7 +85,7 @@ fun ListScreen(navController: NavHostController) {
         topBar = {
             TopAppBar(
                 title = {
-                    Text(stringResource(R.string.app_name))
+                    Text("Daftar Pelamar")
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -111,9 +112,9 @@ fun ListScreen(navController: NavHostController) {
                 )
             }
         },
-//        bottomBar = {
-//            CompanyBottomBar(navController = navController)
-//        }
+        bottomBar = {
+            CompanyBottomBar(navController = navController)
+        }
     )
 
     if (showDialog) {
@@ -201,26 +202,29 @@ fun ApplicantDetailList(
 
 @Composable
 fun ApplicantList(navController: NavHostController, applications: List<DocumentSnapshot>) {
-    LazyColumn {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = 84.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         if (applications.isEmpty()) {
             item {
-                Text("No applications found.")
+                Text("Tidak ada Pelamar")
             }
         } else {
             items(applications) { document ->
                 val userMap = document["user"] as? Map<String, Any> ?: emptyMap()
                 val jobMap = document["job"] as? Map<String, Any> ?: emptyMap()
-                val name = userMap["name"] as? String ?: "N/A"
-                val jobTitle = jobMap["title"] as? String ?: "N/A"
-                val company = jobMap["createdBy.name"] as? String ?: "N/A"
-                val location = jobMap["location"] as? String ?: "N/A"
+                val name = userMap["name"] as? String ?: "Nama Kosong"
+                val jobTitle = jobMap["title"] as? String ?: "Pekerjaan kosong"
+                val location = jobMap["location"] as? String ?: "lokasi kosong"
                 val salary = jobMap["salary"] as? Double ?: 0.0
                 val createdAt = (document["createdAt"] as? com.google.firebase.Timestamp)?.toDate() ?: Date()
 
                 JobApplicationItem(
                     name = name,
                     jobTitle = jobTitle,
-                    company = company,
+
                     location = location,
                     salary = salary,
                     createdAt = createdAt,
@@ -236,7 +240,6 @@ fun ApplicantList(navController: NavHostController, applications: List<DocumentS
 fun JobApplicationItem(
     name: String,
     jobTitle: String,
-    company: String,
     location: String,
     salary: Double,
     createdAt: Date,
@@ -250,8 +253,7 @@ fun JobApplicationItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .border(1.dp, Color.Black, RoundedCornerShape(16.dp))
+            .padding( 8.dp)
             .clickable(onClick = onClick)
     ) {
         Row(
@@ -266,7 +268,6 @@ fun JobApplicationItem(
                     text = jobTitle,
                     style = MaterialTheme.typography.titleMedium,
                 )
-                Text(text = company, style = MaterialTheme.typography.titleMedium)
                 Text(text = location, style = MaterialTheme.typography.titleSmall)
                 Text(text = stringResource(id = R.string.salary_format, salary), style = MaterialTheme.typography.titleSmall)
                 Text(text = formattedDate, style = MaterialTheme.typography.titleSmall)
