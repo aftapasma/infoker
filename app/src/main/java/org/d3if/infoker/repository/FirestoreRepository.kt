@@ -440,4 +440,21 @@ class FirestoreRepository(private val db: FirebaseFirestore) {
             false
         }
     }
+
+    suspend fun saveBiodataByEmail(email: String, biodata: String): Boolean {
+        return try {
+            val userSnapshot = getUserByEmail(email)
+            if (userSnapshot != null) {
+                val userRef = userSnapshot.reference
+                userRef.update("biodata", biodata).await()
+                true
+            } else {
+                Log.d("FirestoreRepository", "User with email $email not found.")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Error saving biodata", e)
+            false
+        }
+    }
 }
