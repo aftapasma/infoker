@@ -252,7 +252,13 @@ fun ApplicantList(
     ) {
         if (applications.isEmpty()) {
             item {
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(16.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                 Text("Tidak ada Pelamar")
+                }
             }
         } else {
             items(applications) { document ->

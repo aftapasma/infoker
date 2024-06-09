@@ -317,19 +317,19 @@ fun Personal(userProfileViewModel: UserProfileViewModel) {
 
     if (showDialog) {
         BiodataDialog(
-            initialBiodata = biodata,
+            initialBiodata = userProfile?.biodata ?: "",
             onDismiss = { showDialog = false },
             onSave = {
-                biodata = it
+                userProfile?.biodata ?: it
                 userProfileViewModel.saveBiodata(it)
                 showDialog = false
             }
         )
     }
 
-    if (biodata.isEmpty()) {
-        BeforePersonalUser(onAddBiodataClick = { showDialog = true })
-    } else {
+//    if (biodata.isEmpty()) {
+//        BeforePersonalUser(onAddBiodataClick = { showDialog = true })
+//    } else {
         Column {
             Row(
                 modifier = Modifier
@@ -352,12 +352,12 @@ fun Personal(userProfileViewModel: UserProfileViewModel) {
                 }
             }
             Text(
-                text = biodata,
+                text = userProfile?.biodata ?: "",
                 modifier = Modifier.padding(8.dp)
             )
         }
     }
-}
+//}
 
 @Composable
 fun BeforePersonalUser(onAddBiodataClick: () -> Unit) {

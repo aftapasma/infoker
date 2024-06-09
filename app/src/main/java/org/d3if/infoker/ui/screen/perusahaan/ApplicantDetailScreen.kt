@@ -159,6 +159,7 @@ fun ApplicantDetailContent(
     val userMap = applicant["user"] as? Map<String, Any> ?: emptyMap()
     val name = userMap["name"] as? String ?: "Unknown"
     val email = userMap["email"] as? String ?: "Unknown"
+    val deskripsi = userMap["biodata"] as? String ?: "Tidak ada biodata"
     val createdAt = (applicant["createdAt"] as? com.google.firebase.Timestamp)?.toDate() ?: Date()
     val context = LocalContext.current
 
@@ -199,14 +200,14 @@ fun ApplicantDetailContent(
             )
         }
 
-        Text(text = "Name: $name", color = Color.Black, style = MaterialTheme.typography.titleLarge)
+        Text(text = "Nama: $name", color = Color.Black, style = MaterialTheme.typography.titleLarge)
         Text(
             text = "Email: $email",
             color = Color.Black,
             style = MaterialTheme.typography.titleMedium
         )
         Text(
-            text = "Applied on: ${DateFormat.getDateInstance().format(createdAt)}",
+            text = "Melamar pada: ${DateFormat.getDateInstance().format(createdAt)}",
             color = Color.Black,
             style = MaterialTheme.typography.titleSmall
         )
@@ -215,6 +216,21 @@ fun ApplicantDetailContent(
         }) {
             Text(text = "Download CV")
         }
+//        Text(
+//            text = "Applied on: ${DateFormat.getDateInstance().format(createdAt)}",
+//            color = Color.Black,
+//            style = MaterialTheme.typography.titleSmall
+//        )
+        Text(
+            text = "Biodata Pelamar:",
+            color = Color.Black,
+            style = MaterialTheme.typography.titleSmall
+        )
+        Text(
+            text = deskripsi,
+            color = Color.Black,
+            style = MaterialTheme.typography.titleSmall
+        )
     }
 }
 
