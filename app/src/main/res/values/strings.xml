@@ -13,4 +13,5 @@
     <string name="edit">Edit</string>
     <string name="isi_biodata">Isi biodata disini</string>
     <string name="simpan">simpan</string>
+    <string name="error_empty_field">Teks field tidak boleh kosong</string>
 </resources>

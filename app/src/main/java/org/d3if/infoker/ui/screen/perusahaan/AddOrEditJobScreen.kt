@@ -13,6 +13,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -80,6 +84,11 @@ fun ScreenContent(
     isEditMode: Boolean,
     modifier: Modifier
 ) {
+    var titleError by remember { mutableStateOf(false) }
+    var locationError by remember { mutableStateOf(false) }
+    var salaryError by remember { mutableStateOf(false) }
+    var descriptionError by remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -88,9 +97,14 @@ fun ScreenContent(
     ) {
         OutlinedTextField(
             value = title,
-            onValueChange = { onTitleChange(it) },
+            onValueChange = {
+                onTitleChange(it)
+                titleError = it.isEmpty()
+            },
             label = { Text(text = stringResource(id = R.string.title)) },
             singleLine = true,
+            isError = titleError,
+            supportingText = { if (titleError) Text(text = stringResource(id = R.string.error_empty_field)) },
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Words,
                 imeAction = ImeAction.Next
@@ -99,9 +113,14 @@ fun ScreenContent(
         )
         OutlinedTextField(
             value = location,
-            onValueChange = { onLocationChange(it) },
+            onValueChange = {
+                onLocationChange(it)
+                locationError = it.isEmpty()
+            },
             label = { Text(text = stringResource(id = R.string.location)) },
             singleLine = true,
+            isError = locationError,
+            supportingText = { if (locationError) Text(text = stringResource(id = R.string.error_empty_field)) },
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Words,
                 imeAction = ImeAction.Next
@@ -110,9 +129,14 @@ fun ScreenContent(
         )
         OutlinedTextField(
             value = salary,
-            onValueChange = { onSalaryChange(it) },
+            onValueChange = {
+                onSalaryChange(it)
+                salaryError = it.isEmpty()
+            },
             label = { Text(text = stringResource(id = R.string.salary)) },
             singleLine = true,
+            isError = salaryError,
+            supportingText = { if (salaryError) Text(text = stringResource(id = R.string.error_empty_field)) },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Next
@@ -121,8 +145,13 @@ fun ScreenContent(
         )
         OutlinedTextField(
             value = description,
-            onValueChange = { onDescriptionChange(it) },
+            onValueChange = {
+                onDescriptionChange(it)
+                descriptionError = it.isEmpty()
+            },
             label = { Text(text = stringResource(id = R.string.description)) },
+            isError = descriptionError,
+            supportingText = { if (descriptionError) Text(text = stringResource(id = R.string.error_empty_field)) },
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences,
                 imeAction = ImeAction.Done
@@ -131,8 +160,20 @@ fun ScreenContent(
         )
         Button(
             onClick = {
-                onAddJobClick()
-                      },
+                val isTitleEmpty = title.isEmpty()
+                val isLocationEmpty = location.isEmpty()
+                val isSalaryEmpty = salary.isEmpty()
+                val isDescriptionEmpty = description.isEmpty()
+
+                titleError = isTitleEmpty
+                locationError = isLocationEmpty
+                salaryError = isSalaryEmpty
+                descriptionError = isDescriptionEmpty
+
+                if (!isTitleEmpty && !isLocationEmpty && !isSalaryEmpty && !isDescriptionEmpty) {
+                    onAddJobClick()
+                }
+            },
             modifier = modifier.fillMaxWidth()
         ) {
             Text(text = if (isEditMode) stringResource(id = R.string.edit) else stringResource(id = R.string.add))
