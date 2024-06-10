@@ -174,7 +174,8 @@ fun SavedApplicationsList(navController: NavHostController, viewModel: ActivityV
                 val jobData = document.get("job") as? Map<*, *>
                 val jobId = jobData?.get("id") as? String ?: "N/A"
                 val title = jobData?.get("title") as? String ?: "N/A"
-                val company = jobData?.get("company") as? String ?: "Afta Tunas Jaya Abadi Tbk."
+                val createdBy = jobData?.get("createdBy") as? Map<*, *>
+                val company = createdBy?.get("name") as? String ?: "Afta Tunas Jaya Abadi Tbk."
                 val timestamp = jobData?.get("createdAt") as? Timestamp
                 val date = timestamp?.toDate()?.let { dateFormat.format(it) } ?: "N/A"
                 val location = jobData?.get("location") as? String ?: "N/A"
@@ -214,7 +215,8 @@ fun AppliedApplicationsList(navController: NavHostController, viewModel: Activit
                 val jobData = document.get("job") as? Map<*, *>
                 val jobId = jobData?.get("id") as? String ?: "N/A"
                 val title = jobData?.get("title") as? String ?: "N/A"
-                val company = jobData?.get("company") as? String ?: "Afta Tunas Jaya Abadi Tbk."
+                val createdBy = jobData?.get("createdBy") as? Map<*, *>
+                val company = createdBy?.get("name") as? String ?: "Afta Tunas Jaya Abadi Tbk."
                 val timestamp = jobData?.get("createdAt") as? Timestamp
                 val date = timestamp?.toDate()?.let { dateFormat.format(it) } ?: "N/A"
                 val location = jobData?.get("location") as? String ?: "N/A"
