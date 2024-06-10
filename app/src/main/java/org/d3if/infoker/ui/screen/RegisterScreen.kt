@@ -257,10 +257,11 @@ fun CompanyRegiterScreen(navController: NavHostController) {
         navController.navigate(Screen.JobList.route)
     }
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
+            .verticalScroll(rememberScrollState())
             .background(
                 color = MaterialTheme.colorScheme.primaryContainer,
             )
@@ -292,34 +293,23 @@ fun CompanyRegiterScreen(navController: NavHostController) {
                 color = MaterialTheme.colorScheme.primary,
             )
         }
-        Box(
-            modifier = Modifier
-                /*.background(
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    shape = RoundedCornerShape(25.dp, 5.dp, 25.dp, 5.dp)
-                )*/
-                .align(Alignment.BottomCenter),
-        ) {
-
-
             Column(
                 modifier = Modifier
                     .padding(16.dp)
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
+                    .fillMaxWidth(),
 
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
                 //.........................Spacer
-                Spacer(modifier = Modifier.height(30.dp))
+//                Spacer(modifier = Modifier.height(30.dp))
 
                 //.........................Text: title
                 Text(
                     text = "Buat Akun",
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .padding(top = 130.dp)
+//                        .padding(top = 130.dp)
                         .fillMaxWidth(),
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.primary,
@@ -383,28 +373,28 @@ fun CompanyRegiterScreen(navController: NavHostController) {
                 }
 
 
-                Spacer(modifier = Modifier.padding(5.dp))
-                androidx.compose.material3.TextButton(onClick = {
-
-//                    navController.navigate("reset_page"){
-//                        popUpTo(navController.graph.startDestinationId)
-//                        launchSingleTop = true
-//                    }
-
-
-                }) {
-//                    androidx.compose.material3.Text(
-//                        text = "Reset Password",
-//                        letterSpacing = 1.sp,
-//                        style = MaterialTheme.typography.labelLarge,
-//                    )
-                }
-                Spacer(modifier = Modifier.padding(20.dp))
+//                Spacer(modifier = Modifier.padding(5.dp))
+//                androidx.compose.material3.TextButton(onClick = {
+//
+////                    navController.navigate("reset_page"){
+////                        popUpTo(navController.graph.startDestinationId)
+////                        launchSingleTop = true
+////                    }
+//
+//
+//                }) {
+////                    androidx.compose.material3.Text(
+////                        text = "Reset Password",
+////                        letterSpacing = 1.sp,
+////                        style = MaterialTheme.typography.labelLarge,
+////                    )
+//                }
+//                Spacer(modifier = Modifier.padding(20.dp))
 
             }
 
 
-        }
+
 
     }
 
