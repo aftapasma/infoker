@@ -351,7 +351,7 @@ fun CompanyRegiterScreen(navController: NavHostController) {
                         } else if (password != passwordConfirm) {
                             Toast.makeText(context, "Password tidak cocok", Toast.LENGTH_SHORT).show()
                         } else {
-                            authViewModel.register(email, password, name, "user", navController)
+                            authViewModel.register(email, password, name, "company", navController)
                         }
                     }
                 )
